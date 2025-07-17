@@ -109,7 +109,6 @@ if uploaded_file is not None:
     batch_data = pd.read_csv(uploaded_file)
     st.write('Uploaded data preview:', batch_data.head())
     # Encode categorical columns to match model training
-    # Map categorical columns safely to handle unseen labels
     edu_map = {v: i for i, v in enumerate(le_edu.classes_)}
     job_map = {v: i for i, v in enumerate(le_job.classes_)}
     if 'Education Level' in batch_data.columns:
@@ -118,6 +117,12 @@ if uploaded_file is not None:
         batch_data['Job Title'] = batch_data['Job Title'].map(job_map).fillna(-1).astype(int)
     if 'Gender' in batch_data.columns:
         batch_data['Gender'] = batch_data['Gender'].map({'Male': 1, 'Female': 0})
+    # Align columns to match model training features
+    expected_cols = ['Age', 'Gender', 'Education Level', 'Job Title', 'Years of Experience']
+    for col in expected_cols:
+        if col not in batch_data.columns:
+            batch_data[col] = 0  # Default value for missing columns
+    batch_data = batch_data[expected_cols]
     batch_preds = model.predict(batch_data)
     # Real-time conversion for batch
     try:
