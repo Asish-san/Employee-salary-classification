@@ -21,7 +21,7 @@ st.markdown("""
 # App logo and title (horizontal layout, small name text)
 st.markdown("""
 <div style='display:flex; align-items:center;'>
-    <img src='assets/logo.png' style='height:40px; margin-right:10px;'>
+    <img src='assets/logo_salary_app.png' style='height:40px; margin-right:10px;'>
     <span style='font-size:12px; color:#888;'>Employee Salary Prediction</span>
 </div>
 """, unsafe_allow_html=True)
@@ -108,6 +108,13 @@ uploaded_file = st.file_uploader('Upload a CSV file for batch prediction', type=
 if uploaded_file is not None:
     batch_data = pd.read_csv(uploaded_file)
     st.write('Uploaded data preview:', batch_data.head())
+    # Encode categorical columns to match model training
+    if 'Education Level' in batch_data.columns:
+        batch_data['Education Level'] = le_edu.transform(batch_data['Education Level'])
+    if 'Job Title' in batch_data.columns:
+        batch_data['Job Title'] = le_job.transform(batch_data['Job Title'])
+    if 'Gender' in batch_data.columns:
+        batch_data['Gender'] = batch_data['Gender'].map({'Male': 1, 'Female': 0})
     batch_preds = model.predict(batch_data)
     # Real-time conversion for batch
     try:
