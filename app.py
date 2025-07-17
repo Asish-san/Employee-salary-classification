@@ -26,11 +26,17 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 st.title('💼 Employee Salary Prediction App')
-st.markdown('<h3 style="color:#43c6ac;">Predict whether a person earn >50K or <50k based on input features</h3>', unsafe_allow_html=True)
+st.markdown('<h3 style="color:#43c6ac;">Predict salary, compare models, and see real-time USD to INR conversion!</h3>', unsafe_allow_html=True)
 
 
 # Load trained model
 model = joblib.load('best_model.pkl')
+st.markdown("""
+<div style='display:flex; align-items:center;'>
+    <img src='assets/output.png' style='height:250px; margin-right:80px;'>
+    <span style='font-size:12px; color:#885;'>Model_Comparison</span>
+</div>
+""", unsafe_allow_html=True)
 
 # Read best model info from file
 with open('assets/best_model_info.txt', 'r') as f:
