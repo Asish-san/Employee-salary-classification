@@ -226,7 +226,7 @@ st.image('assets/logoasish.png', width=40)
 st.markdown("</div>", unsafe_allow_html=True)
 st.markdown("""
 <div class='footer'>
-    <span>Created by <b>Asish Kumar</b> | 
+    <span>Created by <b>Asish Rout</b> | 
     <a class='github-link' href='https://github.com/Asish-san' target='_blank'>Follow me on GitHub</a>
     <br>
     <span style='color:#43c6ac;'>Streamlit Web App</span> &nbsp; <span style='font-size:24px;'>🌐</span>
