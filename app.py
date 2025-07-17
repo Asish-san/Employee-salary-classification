@@ -31,12 +31,6 @@ st.markdown('<h3 style="color:#43c6ac;">Predict salary, compare models, and see 
 
 # Load trained model
 model = joblib.load('best_model.pkl')
-st.markdown("""
-<div style='display:flex; align-items:center;'>
-    <img src='assets/output.png' style='height:250px; margin-right:80px;'>
-    <span style='font-size:12px; color:#885;'>Model_Comparison</span>
-</div>
-""", unsafe_allow_html=True)
 
 # Read best model info from file
 with open('assets/best_model_info.txt', 'r') as f:
