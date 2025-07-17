@@ -17,16 +17,27 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# Set Streamlit page config with custom logo
+st.set_page_config(
+    page_title='Employee Salary Prediction',
+    page_icon='assets/logo_salary_app.png',
+    layout='centered'
+)
+
 
 # App logo and title (horizontal layout, small name text)
 st.markdown("""
 <div style='display:flex; align-items:center;'>
-    <img src='assets/logo.png' style='height:40px; margin-right:10px;'>
+    <span style='margin-right:8px;'>
+        """
+        + st.image('assets/logo.png', width=40)
+        + """
+    </span>
     <span style='font-size:12px; color:#888;'>Employee Salary Prediction</span>
 </div>
 """, unsafe_allow_html=True)
 st.title('💼 Employee Salary Prediction App')
-st.markdown('<h3 style="color:#43c6ac;">Predict salary, compare models, and see real-time USD to INR conversion!</h3>', unsafe_allow_html=True)
+st.markdown('<h3 style="color:#43c6ac;">Predict salary in both USD as well as INR!</h3>', unsafe_allow_html=True)
 
 
 # Load trained model
@@ -149,7 +160,13 @@ st.markdown("""
 st.markdown("""
     <hr>
     <div class='footer'>
-        <img src= 'assets/logoasish.png' class='logo'>
+        <div style='display:flex; justify-content:center; align-items:center;'>
+            <span style='margin-right:8px;'>
+                """
+                + st.image('assets/logoasish.png', width=40)
+                + """
+            </span>
+        </div>
         <br>
         <span>Created by <b>Asish Kumar</b> | 
         <a class='github-link' href='https://github.com/Asish-san' target='_blank'>Follow me on GitHub</a>
