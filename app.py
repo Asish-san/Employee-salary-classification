@@ -24,18 +24,9 @@ st.set_page_config(
     layout='centered'
 )
 
-
-# App logo and title (horizontal layout, small name text)
-st.markdown("""
-<div style='display:flex; align-items:center;'>
-    <span style='margin-right:8px;'>
-        """
-        + st.image('assets/logo.png', width=40)
-        + """
-    </span>
-    <span style='font-size:12px; color:#888;'>Employee Salary Prediction</span>
-</div>
-""", unsafe_allow_html=True)
+st.markdown("<div style='display:flex; align-items:center;'>", unsafe_allow_html=True)
+st.image('assets/logo.png', width=40)
+st.markdown("<span style='font-size:12px; color:#888; margin-left:10px;'>Employee Salary Prediction</span></div>", unsafe_allow_html=True)
 st.title('💼 Employee Salary Prediction App')
 st.markdown('<h3 style="color:#43c6ac;">Predict salary in both USD as well as INR!</h3>', unsafe_allow_html=True)
 
@@ -157,21 +148,14 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Footer with author info and logo
+st.markdown("<hr>", unsafe_allow_html=True)
+st.image('assets/logo_salary_app.png', width=40)
 st.markdown("""
-    <hr>
-    <div class='footer'>
-        <div style='display:flex; justify-content:center; align-items:center;'>
-            <span style='margin-right:8px;'>
-                """
-                + st.image('assets/logoasish.png', width=40)
-                + """
-            </span>
-        </div>
-        <br>
-        <span>Created by <b>Asish Kumar</b> | 
-        <a class='github-link' href='https://github.com/Asish-san' target='_blank'>Follow me on GitHub</a>
-        <br>
-        <span style='color:#43c6ac;'>Streamlit Web App</span> &nbsp; <span style='font-size:24px;'>🌐</span>
-        </span>
-    </div>
+<div class='footer'>
+    <span>Created by <b>Asish Kumar</b> | 
+    <a class='github-link' href='https://github.com/Asish-san' target='_blank'>Follow me on GitHub</a>
+    <br>
+    <span style='color:#43c6ac;'>Streamlit Web App</span> &nbsp; <span style='font-size:24px;'>🌐</span>
+    </span>
+</div>
 """, unsafe_allow_html=True)
