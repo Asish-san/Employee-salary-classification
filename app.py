@@ -4,19 +4,81 @@ import joblib
 import requests
 
 # Custom CSS for gradients, fonts, and layout
+# Custom CSS for gradients, fonts, and layout
 st.markdown("""
     <style>
-    body {background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);}
-    .main {background: linear-gradient(135deg, #f8ffae 0%, #43c6ac 100%);}
-    .stButton>button {background-color: #43c6ac; color: white; font-weight: bold;}
-    .stDownloadButton>button {background-color: #43c6ac; color: white;}
-    .css-1v0mbdj {background: linear-gradient(90deg, #43c6ac 0%, #f8ffae 100%);}
-    .footer {text-align: center; font-size: 18px; margin-top: 40px;}
-    .github-link {color: #24292f; font-weight: bold;}
-    .logo {height: 60px;}
+    body {
+        background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+        animation: gradientBG 10s ease infinite;
+    }
+    @keyframes gradientBG {
+        0% {background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);}
+        50% {background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);}
+        100% {background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);}
+    }
+    .main {
+        background: linear-gradient(135deg, #f8ffae 0%, #43c6ac 100%);
+        border-radius: 18px;
+        box-shadow: 0 4px 24px rgba(67,198,172,0.15);
+        padding: 16px;
+        animation: fadeIn 2s;
+    }
+    @keyframes fadeIn {
+        from {opacity: 0;}
+        to {opacity: 1;}
+    }
+    .stButton>button {
+        background: linear-gradient(90deg, #ff6a00 0%, #ee0979 100%);
+        color: white;
+        font-weight: bold;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(238,9,121,0.15);
+        transition: transform 0.2s;
+    }
+    .stButton>button:hover {
+        transform: scale(1.08);
+        background: linear-gradient(90deg, #43c6ac 0%, #f8ffae 100%);
+        color: #24292f;
+    }
+    .stDownloadButton>button {
+        background: linear-gradient(90deg, #a1c4fd 0%, #c2e9fb 100%);
+        color: #24292f;
+        border-radius: 8px;
+        font-weight: bold;
+        box-shadow: 0 2px 8px rgba(161,196,253,0.15);
+    }
+    .footer {
+        text-align: center;
+        font-size: 20px;
+        margin-top: 40px;
+        color: #ee0979;
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0% {color: #ee0979;}
+        50% {color: #43c6ac;}
+        100% {color: #ee0979;}
+    }
+    .github-link {
+        color: #ff6a00;
+        font-weight: bold;
+        text-decoration: underline;
+        transition: color 0.3s;
+    }
+    .github-link:hover {
+        color: #43c6ac;
+    }
+    .logo {
+        height: 70px;
+        filter: drop-shadow(0 0 8px #43c6ac);
+        animation: bounce 1.5s infinite;
+    }
+    @keyframes bounce {
+        0%, 100% {transform: translateY(0);}
+        50% {transform: translateY(-10px);}
+    }
     </style>
 """, unsafe_allow_html=True)
-
 # Set Streamlit page config with custom logo
 st.set_page_config(
     page_title='Employee Salary Prediction',
@@ -96,15 +158,21 @@ st.markdown("</div>", unsafe_allow_html=True)
 # Predict button with animation
 if st.button('🚀 Predict Salary'):
     salary_pred = model.predict(input_df)[0]
+    # Market payout ranges
+    min_us_salary, max_us_salary = 5000, 120000
+    min_in_salary, max_in_salary = 300000, 5000000
+    # Cap/scale salary to market rates
+    salary_pred_us = min(max(salary_pred, min_us_salary), max_us_salary)
     # Real-time USD to INR conversion
     try:
         response = requests.get('https://api.exchangerate-api.com/v4/latest/USD')
         usd_to_inr = response.json()['rates']['INR']
-        salary_inr = salary_pred * usd_to_inr
-        st.success(f'💰 Predicted Salary: ${salary_pred:,.2f} USD  |  ₹{salary_inr:,.2f} INR')
+        salary_pred_in = min(max(salary_pred_us * usd_to_inr, min_in_salary), max_in_salary)
+        st.success(f'💰 Predicted Salary: ${salary_pred_us:,.2f} USD  |  ₹{salary_pred_in:,.2f} INR')
+        st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43c6ac;'>Real-time USD to INR Rate: <b>₹{usd_to_inr:,.2f}</b></span></div>", unsafe_allow_html=True)
         st.balloons()
     except Exception:
-        st.success(f'💰 Predicted Salary: ${salary_pred:,.2f} USD')
+        st.success(f'💰 Predicted Salary: ${salary_pred_us:,.2f} USD')
         st.warning('⚠️ Could not fetch real-time USD to INR conversion.')
 
 # Batch prediction
