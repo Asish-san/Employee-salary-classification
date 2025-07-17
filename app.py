@@ -21,7 +21,7 @@ st.markdown("""
 # App logo and title (horizontal layout, small name text)
 st.markdown("""
 <div style='display:flex; align-items:center;'>
-    <img src='assets/logo_salary_app.png' style='height:40px; margin-right:10px;'>
+    <img src='assets/logo.png' style='height:40px; margin-right:10px;'>
     <span style='font-size:12px; color:#888;'>Employee Salary Prediction</span>
 </div>
 """, unsafe_allow_html=True)
@@ -149,7 +149,7 @@ st.markdown("""
 st.markdown("""
     <hr>
     <div class='footer'>
-        <img src='https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png' class='logo'>
+        <img src= 'assets/logoasish.png' class='logo'>
         <br>
         <span>Created by <b>Asish Kumar</b> | 
         <a class='github-link' href='https://github.com/Asish-san' target='_blank'>Follow me on GitHub</a>
