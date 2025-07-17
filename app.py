@@ -149,7 +149,9 @@ st.markdown("""
 
 # Footer with author info and logo
 st.markdown("<hr>", unsafe_allow_html=True)
-st.image('assets/logoasish.png', width=60, Layout='Centered')
+st.markdown("<div style='display:flex; justify-content:center; align-items:center;'>", unsafe_allow_html=True)
+st.image('assets/logoasish.png', width=40)
+st.markdown("</div>", unsafe_allow_html=True)
 st.markdown("""
 <div class='footer'>
     <span>Created by <b>Asish Kumar</b> | 
