@@ -18,13 +18,13 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # App logo and title
-st.image("logo_salary_app.png", width=80, caption="Employee Salary Classification")
+st.image("assets/logo.png", width=80, caption="Employee Salary Classification")
 st.title('💼 Employee Salary Classification App')
 st.markdown('<h3 style="color:#43c6ac;">Predict whether a person earn >50K or <50k based on input features!</h3>', unsafe_allow_html=True)
 
 # Load trained model and model comparison image
 model = joblib.load('best_model.pkl')
-model_comparison_img_url = r"c:\Users\asish\Downloads\ESP\output.png"  # Example image
+model_comparison_img_url = "assets/output.png"  # Example image
 # Sidebar inputs
 st.sidebar.header('👤 Input Employee Details')
 age = st.sidebar.slider('Age', 18, 65, 30)
