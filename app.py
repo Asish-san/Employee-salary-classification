@@ -24,8 +24,7 @@ st.markdown('<h3 style="color:#43c6ac;">Predict whether a person earn >50K or <5
 
 # Load trained model and model comparison image
 model = joblib.load('best_model.pkl')
-model_comparison_img_url = "c:\Users\asish\Downloads\ESP\output.png"  # Example image
-
+model_comparison_img_url = r"c:\Users\asish\Downloads\ESP\output.png"  # Example image
 # Sidebar inputs
 st.sidebar.header('👤 Input Employee Details')
 age = st.sidebar.slider('Age', 18, 65, 30)
