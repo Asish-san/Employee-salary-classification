@@ -18,9 +18,9 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # App logo and title
-st.image("logo_salary_app.png", width=80, caption="Employee Salary Prediction")
-st.title('💼 Employee Salary Prediction App')
-st.markdown('<h3 style="color:#43c6ac;">Predict salary, compare models, and see real-time USD to INR conversion!</h3>', unsafe_allow_html=True)
+st.image("logo_salary_app.png", width=80, caption="Employee Salary Classification")
+st.title('💼 Employee Salary Classification App')
+st.markdown('<h3 style="color:#43c6ac;">Predict whether a person earn >50K or <50k based on input features!</h3>', unsafe_allow_html=True)
 
 # Load trained model and model comparison image
 model = joblib.load('best_model.pkl')
