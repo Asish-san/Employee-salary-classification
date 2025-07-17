@@ -17,14 +17,27 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# App logo and title
-st.image("assets/logo.png", width=80, caption="Employee Salary Classification")
-st.title('💼 Employee Salary Classification App')
-st.markdown('<h3 style="color:#43c6ac;">Predict whether a person earn >50K or <50k based on input features!</h3>', unsafe_allow_html=True)
 
-# Load trained model and model comparison image
+# App logo and title (horizontal layout, small name text)
+st.markdown("""
+<div style='display:flex; align-items:center;'>
+    <img src='assets/logo.png' style='height:40px; margin-right:10px;'>
+    <span style='font-size:12px; color:#888;'>Employee Salary Prediction</span>
+</div>
+""", unsafe_allow_html=True)
+st.title('💼 Employee Salary Prediction App')
+st.markdown('<h3 style="color:#43c6ac;">Predict whether a person earn >50K or <50k based on input features</h3>', unsafe_allow_html=True)
+
+
+# Load trained model
 model = joblib.load('best_model.pkl')
-model_comparison_img_url = "assets/output.png"  # Example image
+
+# Read best model info from file
+with open('assets/best_model_info.txt', 'r') as f:
+    best_model_info = f.read().strip().splitlines()
+best_model_name = best_model_info[0].split(': ')[1]
+best_r2 = float(best_model_info[1].split(': ')[1])
+
 # Sidebar inputs
 st.sidebar.header('👤 Input Employee Details')
 age = st.sidebar.slider('Age', 18, 65, 30)
@@ -40,6 +53,7 @@ job_title = st.sidebar.selectbox('Job Title', [
 ])
 experience = st.sidebar.slider('Years of Experience', 0, 40, 5)
 
+
 # Input DataFrame (must match training features)
 input_df = pd.DataFrame({
     'Age': [age],
@@ -49,14 +63,29 @@ input_df = pd.DataFrame({
     'Years of Experience': [experience]
 })
 
+# Encode categorical features to match model training
+from sklearn.preprocessing import LabelEncoder
+le_edu = LabelEncoder()
+le_job = LabelEncoder()
+# Fit encoders on all possible values (should match training)
+le_edu.fit([
+    'Bachelors', 'Masters', 'PhD', 'HS-grad', 'Assoc', 'Some-college'
+])
+le_job.fit([
+    'Tech-support', 'Craft-repair', 'Other-service', 'Sales',
+    'Exec-managerial', 'Prof-specialty', 'Handlers-cleaners', 'Machine-op-inspct',
+    'Adm-clerical', 'Farming-fishing', 'Transport-moving', 'Priv-house-serv',
+    'Protective-serv', 'Armed-Forces'
+])
+input_df['Education Level'] = le_edu.transform(input_df['Education Level'])
+input_df['Job Title'] = le_job.transform(input_df['Job Title'])
+
 st.write('### 🔎 Input Data')
 st.dataframe(input_df, use_container_width=True)
 
-# Model comparison image and R2 score
+# Model R2 score display
 st.markdown('---')
-st.image(model_comparison_img_url, caption='Model Comparison', use_column_width=True)
-if 'best_model_name' in globals() and 'best_r2' in globals():
-    st.markdown(f"<h4>🏆 <span style='color:#43c6ac'>Best Model:</span> {best_model_name} | <span style='color:#43c6ac'>R² Score:</span> {best_r2:.4f}</h4>", unsafe_allow_html=True)
+st.markdown(f"<h4>🏆 <span style='color:#43c6ac'>Best Model:</span> {best_model_name} | <span style='color:#43c6ac'>R² Score:</span> {best_r2:.4f}</h4>", unsafe_allow_html=True)
 
 # Predict button with animation
 if st.button('🚀 Predict Salary'):
