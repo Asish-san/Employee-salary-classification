@@ -88,6 +88,10 @@ st.dataframe(input_df, use_container_width=True)
 # Model R2 score display
 st.markdown('---')
 st.markdown(f"<h4>🏆 <span style='color:#43c6ac'>Best Model:</span> {best_model_name} | <span style='color:#43c6ac'>R² Score:</span> {best_r2:.4f}</h4>", unsafe_allow_html=True)
+# Show model performance
+st.markdown("<div style='display:flex; justify-content:center; align-items:center;'>", unsafe_allow_html=True)
+st.image('assets/model_performance.png', caption='Model Performance Comparison', width=500)
+st.markdown("</div>", unsafe_allow_html=True)
 
 # Predict button with animation
 if st.button('🚀 Predict Salary'):
