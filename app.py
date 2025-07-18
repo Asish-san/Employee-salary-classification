@@ -261,30 +261,32 @@ if st.button('🚀 Predict Salary'):
     st.balloons()
 
 # Batch prediction
+# Batch prediction
 st.markdown('---')
 st.markdown('#### 📂 Batch Prediction')
 uploaded_file = st.file_uploader('Upload a CSV file for batch prediction', type='csv')
 if uploaded_file is not None:
-    batch_data = pd.read_csv(uploaded_file)
-    st.write('Uploaded data preview:', batch_data.head())
-    # Encode categorical columns to match model training
-    edu_map = {v: i for i, v in enumerate(le_edu.classes_)}
-    job_map = {v: i for i, v in enumerate(le_job.classes_)}
-    if 'Education Level' in batch_data.columns:
-        batch_data['Education Level'] = batch_data['Education Level'].map(edu_map).fillna(-1).astype(int)
-    if 'Job Title' in batch_data.columns:
-        batch_data['Job Title'] = batch_data['Job Title'].map(job_map).fillna(-1).astype(int)
-    if 'Gender' in batch_data.columns:
-        batch_data['Gender'] = batch_data['Gender'].map({'Male': 1, 'Female': 0})
-    # Align columns to match model training features
-    expected_cols = ['Age', 'Gender', 'Education Level', 'Job Title', 'Years of Experience']
-    for col in expected_cols:
-        if col not in batch_data.columns:
-            batch_data[col] = 0  # Default value for missing columns
-    batch_data = batch_data[expected_cols]
-    batch_preds = model.predict(batch_data)
-    # Real-time conversion for batch
+
     try:
+        batch_data = pd.read_csv(uploaded_file)
+        st.write('Uploaded data preview:', batch_data.head())
+        # Encode categorical columns to match model training
+        edu_map = {v: i for i, v in enumerate(le_edu.classes_)}
+        job_map = {v: i for i, v in enumerate(le_job.classes_)}
+        if 'Education Level' in batch_data.columns:
+            batch_data['Education Level'] = batch_data['Education Level'].map(edu_map).fillna(-1).astype(int)
+        if 'Job Title' in batch_data.columns:
+            batch_data['Job Title'] = batch_data['Job Title'].map(job_map).fillna(-1).astype(int)
+        if 'Gender' in batch_data.columns:
+            batch_data['Gender'] = batch_data['Gender'].map({'Male': 1, 'Female': 0})
+        # Align columns to match model training features
+        expected_cols = ['Age', 'Gender', 'Education Level', 'Job Title', 'Years of Experience']
+        for col in expected_cols:
+            if col not in batch_data.columns:
+                batch_data[col] = 0  # Default value for missing columns
+        batch_data = batch_data[expected_cols]
+        batch_preds = model.predict(batch_data)
+        # Real-time conversion for batch
         response = requests.get('https://api.exchangerate-api.com/v4/latest/USD')
         usd_to_inr = response.json()['rates']['INR']
         # AI-based market standard payout mapping for jobs
@@ -384,11 +386,11 @@ if uploaded_file is not None:
             batch_data.at[idx, 'PredictedSalaryINR'] = pred_in
             batch_data.at[idx, 'PredictedSalaryUSD_from_INR'] = pred_in_to_us
             batch_data.at[idx, 'PredictedSalaryINR_from_USD'] = pred_us_to_inr
-    st.write('✅ Predictions:')
-    st.dataframe(batch_data.head(), use_container_width=True)
-    csv = batch_data.to_csv(index=False).encode('utf-8')
-    st.download_button('⬇️ Download Predictions CSV', csv, file_name='predicted_salaries.csv', mime='text/csv')
-except Exception as e:
+        st.write('✅ Predictions:')
+        st.dataframe(batch_data.head(), use_container_width=True)
+        csv = batch_data.to_csv(index=False).encode('utf-8')
+        st.download_button('⬇️ Download Predictions CSV', csv, file_name='predicted_salaries.csv', mime='text/csv')
+    except Exception as e:
         st.error(f"Batch prediction failed: {e}")
 
 
