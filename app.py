@@ -388,6 +388,8 @@ if uploaded_file is not None:
         # Fallback: just use model predictions
         batch_data['PredictedSalaryUSD'] = batch_preds
         batch_data['PredictedSalaryINR'] = 'N/A'
+        batch_data['PredictedSalaryUSD_from_INR'] = 'N/A'
+        batch_data['PredictedSalaryINR_from_USD'] = 'N/A'
     st.write('✅ Predictions:')
     st.dataframe(batch_data.head(), use_container_width=True)
     csv = batch_data.to_csv(index=False).encode('utf-8')
