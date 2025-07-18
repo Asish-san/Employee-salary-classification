@@ -49,16 +49,11 @@ st.markdown("""
         margin-bottom: 18px;
     }
     .stButton>button {
-        background: linear-gradient(90deg, #fc00ff 0%, #f6d365 50%, #43c6ac 100%);
+        background: linear-gradient(90deg, #2193b0 0%, #6dd5ed 100%);
         font-weight: bold;
         border-radius: 10px;
         box-shadow: 0 2px 12px rgba(252,0,255,0.18);
         transition: transform 0.2s;
-        color: transparent;
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-image: linear-gradient(90deg, #222 0%, #444 100%);
         color: #222;
     }
         background: linear-gradient(90deg, #fc00ff 0%, #f6d365 50%, #43c6ac 100%);
@@ -231,28 +226,32 @@ if st.button('🚀 Predict Salary'):
         else:
             return (base_in, base_in + 200000)
 
-    # selected job title
+    # Get selected job title
     job = job_title
-    if currency.startswith('USD'):
-        payout_range = us_market_payout.get(job, ai_job_payout(job, 'USD'))
-        salary_pred = model.predict(input_df)[0]
-        # Scale prediction to market range
-        salary_pred_us = min(max(salary_pred, payout_range[0]), payout_range[1])
-        st.success(f'💰 Predicted Salary (US Market): ${salary_pred_us:,.2f} USD')
-    else:
-        payout_range = in_market_payout.get(job, ai_job_payout(job, 'INR'))
-        salary_pred = model.predict(input_df)[0]
-        # Scale prediction to market range
-        salary_pred_in = min(max(salary_pred, payout_range[0]), payout_range[1])
-        st.success(f'💰 Predicted Salary (Indian Market): ₹{salary_pred_in:,.2f} INR')
-    # Show real-time USD to INR rate
+    salary_pred = model.predict(input_df)[0]
+    # Get real-time USD to INR rate
     try:
         response = requests.get('https://api.exchangerate-api.com/v4/latest/USD')
         usd_to_inr = response.json()['rates']['INR']
-        st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>Real-time USD to INR Rate: <b>₹{usd_to_inr:,.2f}</b></span></div>", unsafe_allow_html=True)
-        st.balloons()
     except Exception:
-        st.warning('⚠️ Could not fetch real-time USD to INR conversion.')
+        usd_to_inr = 83.0  # fallback value
+    # US market prediction
+    payout_range_us = us_market_payout.get(job, ai_job_payout(job, 'USD'))
+    salary_pred_us = min(max(salary_pred, payout_range_us[0]), payout_range_us[1])
+    # Indian market prediction
+    payout_range_in = in_market_payout.get(job, ai_job_payout(job, 'INR'))
+    salary_pred_in = min(max(salary_pred, payout_range_in[0]), payout_range_in[1])
+    # Convert between currencies
+    salary_us_to_inr = salary_pred_us * usd_to_inr
+    salary_in_to_us = salary_pred_in / usd_to_inr
+    if currency.startswith('USD'):
+        st.success(f'💰 Predicted Salary (US Market): ${salary_pred_us:,.2f} USD')
+        st.info(f'Equivalent in INR: ₹{salary_us_to_inr:,.2f}')
+    else:
+        st.success(f'💰 Predicted Salary (Indian Market): ₹{salary_pred_in:,.2f} INR')
+        st.info(f'Equivalent in USD: ${salary_in_to_us:,.2f}')
+    st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>Real-time USD to INR Rate: <b>₹{usd_to_inr:,.2f}</b></span></div>", unsafe_allow_html=True)
+    st.balloons()
 
 # Batch prediction
 st.markdown('---')
