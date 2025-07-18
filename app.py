@@ -362,16 +362,32 @@ if uploaded_file is not None:
                 edu_str = None
             # Get model prediction
             pred = batch_preds[idx]
-            # US market
+            # US market payout
             payout_us = us_market_payout.get(job_str, ai_job_payout(job_str, edu_str, exp, 'USD'))
             pred_us = min(max(pred, payout_us[0]), payout_us[1])
-            # IN market
+            # IN market payout
             payout_in = in_market_payout.get(job_str, ai_job_payout(job_str, edu_str, exp, 'INR'))
             pred_in = min(max(pred, payout_in[0]), payout_in[1])
+            # Convert both ways
+            pred_us_to_inr = pred_us * usd_to_inr
+            pred_in_to_us = pred_in / usd_to_inr
             pred_usd.append(pred_us)
             pred_inr.append(pred_in)
-        batch_data['PredictedSalaryUSD'] = pred_usd
-        batch_data['PredictedSalaryINR'] = [x * usd_to_inr for x in pred_usd]
+            # Store both conversions for each row
+            if 'PredictedSalaryUSD' not in batch_data.columns:
+                batch_data['PredictedSalaryUSD'] = 0
+            if 'PredictedSalaryINR' not in batch_data.columns:
+                batch_data['PredictedSalaryINR'] = 0
+            if 'PredictedSalaryUSD_from_INR' not in batch_data.columns:
+                batch_data['PredictedSalaryUSD_from_INR'] = 0
+            if 'PredictedSalaryINR_from_USD' not in batch_data.columns:
+                batch_data['PredictedSalaryINR_from_USD'] = 0
+            batch_data.at[idx, 'PredictedSalaryUSD'] = pred_us
+            batch_data.at[idx, 'PredictedSalaryINR'] = pred_in
+            batch_data.at[idx, 'PredictedSalaryUSD_from_INR'] = pred_in_to_us
+            batch_data.at[idx, 'PredictedSalaryINR_from_USD'] = pred_us_to_inr
+    except Exception:
+        # Fallback: just use model predictions
     except Exception:
         batch_data['PredictedSalaryUSD'] = batch_preds
         batch_data['PredictedSalaryINR'] = 'N/A'
