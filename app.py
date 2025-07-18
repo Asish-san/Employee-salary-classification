@@ -59,13 +59,7 @@ st.markdown("""
         100% {color: #fc00ff;}
     }
     .github-link {
-        color: #00dbde;
-        font-weight: bold;
-        text-decoration: underline;
-        transition: color 0.3s;
-    }
-    .github-link:hover {
-        color: #fc00ff;
+        display: none !important;
     }
     .logo {
         height: 80px;
@@ -291,7 +285,6 @@ st.markdown("</div>", unsafe_allow_html=True)
 st.markdown("""
 <div class='footer'>
     <span>Created by <b>Asish Kumar</b> | 
-    <a class='github-link' href='https://github.com/Asish-san' target='_blank'>Follow me on GitHub</a>
     <br>
     <span style='color:#43c6ac;'>Streamlit Web App</span> &nbsp; <span style='font-size:24px;'>🌐</span>
     </span>
