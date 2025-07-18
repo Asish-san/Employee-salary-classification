@@ -277,10 +277,7 @@ if uploaded_file is not None:
     st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>Batch Salary Stats:<br>Min: ${batch_stats['Min']:,.2f} | Max: ${batch_stats['Max']:,.2f} | Mean: ${batch_stats['Mean']:,.2f} | Median: ${batch_stats['Median']:,.2f}</span></div>", unsafe_allow_html=True)
     csv = batch_data.to_csv(index=False).encode('utf-8')
     st.download_button('⬇️ Download Predictions CSV', csv, file_name='predicted_salaries.csv', mime='text/csv')
-        # ...existing code...
-    except Exception as e:
-        st.error(f"Batch prediction failed: {e}")
-
+           # No additional code needed here
 # Animations and emojis
 st.markdown("""
     <div style='text-align:center;'>
