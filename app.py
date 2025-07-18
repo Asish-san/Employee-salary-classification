@@ -287,8 +287,6 @@ if uploaded_file is not None:
     try:
         response = requests.get('https://api.exchangerate-api.com/v4/latest/USD')
         usd_to_inr = response.json()['rates']['INR']
-        batch_data['PredictedSalaryUSD'] = batch_preds
-        batch_data['PredictedSalaryINR'] = batch_preds * usd_to_inr
         # AI-based market standard payout mapping for jobs
         us_market_payout = {
             'Tech-support': (35000, 65000),
