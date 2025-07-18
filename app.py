@@ -199,8 +199,8 @@ if st.button('🚀 Predict Salary'):
         'Protective-serv': (400000, 950000),
         'Armed-Forces': (400000, 1200000)
     }
-    # Use AI logic for jobs not in mapping
-    def ai_job_payout(job, experience, education, market):
+     # Use AI logic for jobs not in mapping
+    def ai_market_payout(job, experience, education, market):
         # Example: Use experience and education to estimate
         base_us = 35000 + (experience * 1000) + (education * 2000)
         base_in = 350000 + (experience * 20000) + (education * 40000)
@@ -216,13 +216,13 @@ if st.button('🚀 Predict Salary'):
     edu_num = edu_list.index(education) if education in edu_list else 3
     exp_num = experience
     if currency.startswith('USD'):
-        payout_range = us_market_payout.get(job, ai_job_payout(job, exp_num, edu_num, 'USD'))
+        payout_range = us_market_payout.get(job, ai_market_payout(job, exp_num, edu_num, 'USD'))
         salary_pred = model.predict(input_df)[0]
         # Scale prediction to market range
         salary_pred_us = min(max(salary_pred, payout_range[0]), payout_range[1])
         st.success(f'💰 Predicted Salary (US Market): ${salary_pred_us:,.2f} USD')
     else:
-        payout_range = in_market_payout.get(job, ai_job_payout(job, exp_num, edu_num, 'INR'))
+        payout_range = in_market_payout.get(job, ai_market_payout(job, exp_num, edu_num, 'INR'))
         salary_pred = model.predict(input_df)[0]
         # Scale prediction to market range
         salary_pred_in = min(max(salary_pred, payout_range[0]), payout_range[1])
