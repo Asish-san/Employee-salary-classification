@@ -163,8 +163,6 @@ st.markdown(f"<h4>🏆 <span style='color:#43c6ac'>Best Model:</span> {best_mode
 st.markdown("<div style='display:flex; justify-content:center; align-items:center;'>", unsafe_allow_html=True)
 st.image('assets/model_performance.png', caption='Model Performance Comparison', width=500)
 st.markdown("</div>", unsafe_allow_html=True)
-# Show model performance PNG
-st.image('assets/model_performance.png', caption='Model Performance Comparison', width=500)
 
 # Predict button with animation
 if st.button('🚀 Predict Salary'):
@@ -202,7 +200,7 @@ if st.button('🚀 Predict Salary'):
         'Armed-Forces': (400000, 1200000)
     }
     # Use AI logic for jobs not in mapping
-    def ai_job_payout(job, market):
+     def ai_job_payout(job, experience, education, market):
         # Example: Use experience and education to estimate
         base_us = 35000 + (experience * 1000) + (education * 2000)
         base_in = 350000 + (experience * 20000) + (education * 40000)
@@ -213,14 +211,20 @@ if st.button('🚀 Predict Salary'):
 
     # Get selected job title
     job = job_title
+    edu_num = [
+        'Bachelors', 'Masters', 'PhD', 'HS-grad', 'Assoc', 'Some-college'
+    ].index(education) if education in [
+        'Bachelors', 'Masters', 'PhD', 'HS-grad', 'Assoc', 'Some-college'
+    ] else 3
+    exp_num = experience
     if currency.startswith('USD'):
-        payout_range = us_market_payout.get(job, ai_job_payout(job, 'USD'))
+        payout_range = us_market_payout.get(job, ai_job_payout(job, exp_num, edu_num, 'USD'))
         salary_pred = model.predict(input_df)[0]
         # Scale prediction to market range
         salary_pred_us = min(max(salary_pred, payout_range[0]), payout_range[1])
         st.success(f'💰 Predicted Salary (US Market): ${salary_pred_us:,.2f} USD')
     else:
-        payout_range = in_market_payout.get(job, ai_job_payout(job, 'INR'))
+        payout_range = in_market_payout.get(job, ai_job_payout(job, exp_num, edu_num, 'INR'))
         salary_pred = model.predict(input_df)[0]
         # Scale prediction to market range
         salary_pred_in = min(max(salary_pred, payout_range[0]), payout_range[1])
