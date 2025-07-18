@@ -86,7 +86,7 @@ st.markdown("<div style='display:flex; align-items:center;'>", unsafe_allow_html
 st.image('logo.png', width=40)
 st.markdown("<span style='font-size:12px; color:#888; margin-left:10px;'>Employee Salary Prediction</span></div>", unsafe_allow_html=True)
 st.title('💼 Employee Salary Prediction App')
-st.markdown('<h3 style="color:#43c6ac;">Predict individual and batch salary prediction along with statistical analysis!</h3>', unsafe_allow_html=True)
+st.markdown('<h3 style="color:#43c6ac;">Predict salary along with statistical analysis and job market outlook with future job growth analysis!</h3>', unsafe_allow_html=True)
 
 
 # Load trained model
@@ -119,12 +119,6 @@ currency = st.sidebar.radio('Select Market Currency', ['USD (US Market)', 'INR (
 # Input DataFrame (must match training features)
 input_edu = custom_education if education == 'Custom' and custom_education else education
 input_job = custom_job if job_title == 'Custom' and custom_job else job_title
-input_df = pd.DataFrame({
-    'Age': [age],
-    'Gender': [1 if gender == 'Male' else 0],
-    'Education Level': [input_edu],
-    'Job Title': [input_job],
-    'Years of Experience': [experience]})
 
 # Encode categorical features to match model training
 from sklearn.preprocessing import LabelEncoder
@@ -140,6 +134,32 @@ le_job.fit([
     'Adm-clerical', 'Farming-fishing', 'Transport-moving', 'Priv-house-serv',
     'Protective-serv', 'Armed-Forces', 'Custom'
 ])
+# Map unseen education/job to 'Custom' for LabelEncoder
+edu_for_encoder = input_edu if input_edu in le_edu.classes_ else 'Custom'
+job_for_encoder = input_job if input_job in le_job.classes_ else 'Custom'
+input_df = pd.DataFrame({
+    'Age': [age],
+    'Gender': [1 if gender == 'Male' else 0],
+    'Education Level': [edu_for_encoder],
+    'Job Title': [job_for_encoder],
+    'Years of Experience': [experience]})
+input_df['Education Level'] = le_edu.transform(input_df['Education Level'])
+input_df['Job Title'] = le_job.transform(input_df['Job Title'])
+# Encode categorical features to match model training
+from sklearn.preprocessing import LabelEncoder
+le_edu = LabelEncoder()
+le_job = LabelEncoder()
+# Fit encoders on all possible values (should match training)
+le_edu.fit([
+    'Bachelors', 'Masters', 'PhD', 'HS-grad', 'Assoc', 'Some-college', 'Custom'
+])
+le_job.fit([
+    'Tech-support', 'Craft-repair', 'Other-service', 'Sales',
+    'Exec-managerial', 'Prof-specialty', 'Handlers-cleaners', 'Machine-op-inspct',
+    'Adm-clerical', 'Farming-fishing', 'Transport-moving', 'Priv-house-serv',
+    'Protective-serv', 'Armed-Forces', 'Custom'
+])
+# Already mapped above, so no error will occur
 input_df['Education Level'] = le_edu.transform(input_df['Education Level'])
 input_df['Job Title'] = le_job.transform(input_df['Job Title'])
 
@@ -389,7 +409,7 @@ st.markdown("""
 # Footer with author info and logo
 st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown("<div style='display:flex; justify-content:center; align-items:center;'>", unsafe_allow_html=True)
-st.image('logo.png', width=40)
+st.image('logoasish.png', width=40)
 st.markdown("</div>", unsafe_allow_html=True)
 st.markdown("""
 <div class='footer'>
