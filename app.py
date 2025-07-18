@@ -7,18 +7,20 @@ import requests
 st.markdown("""
     <style>
     body {
-        background: linear-gradient(120deg, #f093fb 0%, #f5576c 100%);
-        animation: gradientBG 10s ease infinite;
+        background: linear-gradient(120deg, #f6d365 0%, #fdc094 25%, #fda085 50%, #a1c4fd 75%, #c2e9fb 100%);
+        animation: gradientBG 12s ease infinite;
     }
     @keyframes gradientBG {
-        0% {background: linear-gradient(120deg, #f093fb 0%, #f5576c 100%);}
-        50% {background: linear-gradient(120deg, #4facfe 0%, #00f2fe 100%);}
-        100% {background: linear-gradient(120deg, #f093fb 0%, #f5576c 100%);}
+        0% {background: linear-gradient(120deg, #f6d365 0%, #fdc094 25%, #fda085 50%, #a1c4fd 75%, #c2e9fb 100%);}
+        25% {background: linear-gradient(120deg, #f093fb 0%, #f5576c 100%);}
+        50% {background: linear-gradient(120deg, #43e97b 0%, #38f9d7 100%);}
+        75% {background: linear-gradient(120deg, #fc00ff 0%, #00dbde 100%);}
+        100% {background: linear-gradient(120deg, #f6d365 0%, #fdc094 25%, #fda085 50%, #a1c4fd 75%, #c2e9fb 100%);}
     }
     .main {
-        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        background: linear-gradient(135deg, #f8ffae 0%, #43c6ac 25%, #fc00ff 50%, #00dbde 75%, #f093fb 100%);
         border-radius: 22px;
-        box-shadow: 0 6px 32px rgba(67,233,123,0.18);
+        box-shadow: 0 6px 32px rgba(252,0,255,0.18);
         padding: 20px;
         animation: fadeIn 2s;
     }
@@ -27,7 +29,7 @@ st.markdown("""
         to {opacity: 1;}
     }
     .stButton>button {
-        background: linear-gradient(90deg, #fc00ff 0%, #00dbde 100%);
+        background: linear-gradient(90deg, #fc00ff 0%, #f6d365 50%, #43c6ac 100%);
         color: white;
         font-weight: bold;
         border-radius: 10px;
@@ -36,36 +38,15 @@ st.markdown("""
     }
     .stButton>button:hover {
         transform: scale(1.10);
-        background: linear-gradient(90deg, #f5576c 0%, #f093fb 100%);
+        background: linear-gradient(90deg, #f5576c 0%, #f093fb 50%, #43e97b 100%);
         color: #24292f;
     }
     .stDownloadButton>button {
-        background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
+        background: linear-gradient(90deg, #43e97b 0%, #f8ffae 50%, #fc00ff 100%);
         color: #24292f;
         border-radius: 10px;
         font-weight: bold;
         box-shadow: 0 2px 12px rgba(67,233,123,0.18);
-    }
-    .footer {
-        text-align: center;
-        font-size: 22px;
-        margin-top: 40px;
-        color: #fc00ff;
-        animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-        0% {color: #fc00ff;}
-        50% {color: #43e97b;}
-        100% {color: #fc00ff;}
-    }
-    .github-link {
-        color: #00dbde;
-        font-weight: bold;
-        text-decoration: underline;
-        transition: color 0.3s;
-    }
-    .github-link:hover {
-        color: #fc00ff;
     }
     .logo {
         height: 80px;
@@ -73,7 +54,7 @@ st.markdown("""
         animation: bounce 1.5s infinite;
         border-radius: 20px;
         border: 3px solid #43e97b;
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #fc00ff 100%);
         box-shadow: 0 2px 12px rgba(252,0,255,0.18);
     }
     @keyframes bounce {
@@ -163,8 +144,6 @@ st.markdown(f"<h4>🏆 <span style='color:#43c6ac'>Best Model:</span> {best_mode
 st.markdown("<div style='display:flex; justify-content:center; align-items:center;'>", unsafe_allow_html=True)
 st.image('assets/model_performance.png', caption='Model Performance Comparison', width=500)
 st.markdown("</div>", unsafe_allow_html=True)
-# Show model performance PNG
-st.image('assets/model_performance.png', caption='Model Performance Comparison', width=500)
 
 # Predict button with animation
 if st.button('🚀 Predict Salary'):
