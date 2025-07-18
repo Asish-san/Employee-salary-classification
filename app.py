@@ -120,11 +120,11 @@ currency = st.sidebar.radio('Select Market Currency', ['USD (US Market)', 'INR (
 input_edu = custom_education if education == 'Custom' and custom_education else education
 input_job = custom_job if job_title == 'Custom' and custom_job else job_title
 
-# Encode categorical features to match model training
+# Efficiently encode categorical features to match model training
 from sklearn.preprocessing import LabelEncoder
 le_edu = LabelEncoder()
 le_job = LabelEncoder()
-# Fit encoders on all possible values (should match training)
+
 le_edu.fit([
     'Bachelors', 'Masters', 'PhD', 'HS-grad', 'Assoc', 'Some-college', 'Custom'
 ])
@@ -135,13 +135,13 @@ le_job.fit([
     'Protective-serv', 'Armed-Forces', 'Custom'
 ])
 # Map unseen education/job to 'Custom' for LabelEncoder
-edu_for_encoder = input_edu if input_edu in le_edu.classes_ else 'Custom'
-job_for_encoder = input_job if input_job in le_job.classes_ else 'Custom'
+def safe_label(val, classes):
+    return val if val in classes else 'Custom'
 input_df = pd.DataFrame({
     'Age': [age],
     'Gender': [1 if gender == 'Male' else 0],
-    'Education Level': [edu_for_encoder],
-    'Job Title': [job_for_encoder],
+    'Education Level': [safe_label(input_edu, le_edu.classes_)],
+    'Job Title': [safe_label(input_job, le_job.classes_)],
     'Years of Experience': [experience]})
 input_df['Education Level'] = le_edu.transform(input_df['Education Level'])
 input_df['Job Title'] = le_job.transform(input_df['Job Title'])
