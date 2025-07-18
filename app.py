@@ -227,17 +227,25 @@ if st.button('🚀 Predict Salary'):
         # Scale prediction to market range
         salary_pred_in = min(max(salary_pred, payout_range[0]), payout_range[1])
         st.success(f'💰 Predicted Salary (Indian Market): ₹{salary_pred_in:,.2f} INR')
-    # Show real-time USD to INR rate
+    # Show real-time USD to INR and INR to USD rate
     try:
-        response = requests.get('https://api.exchangerate.host/latest?base=USD')
-        usd_to_inr = response.json()['rates']['INR']
-        st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>Real-time USD to INR Rate: <b>₹{usd_to_inr:,.2f}</b></span></div>", unsafe_allow_html=True)
+        response_usd = requests.get('https://api.exchangerate.host/latest?base=USD')
+        response_inr = requests.get('https://api.exchangerate.host/latest?base=INR')
+        usd_to_inr = response_usd.json()['rates'].get('INR', None)
+        inr_to_usd = response_inr.json()['rates'].get('USD', None)
+        rate_msg = ""
+        if usd_to_inr:
+            rate_msg += f"Real-time USD to INR Rate: <b>₹{usd_to_inr:,.2f}</b><br>"
+        else:
+            rate_msg += "USD to INR rate unavailable.<br>"
+        if inr_to_usd:
+            rate_msg += f"Real-time INR to USD Rate: <b>${inr_to_usd:,.4f}</b>"
+        else:
+            rate_msg += "INR to USD rate unavailable."
+        st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>{rate_msg}</span></div>", unsafe_allow_html=True)
         st.balloons()
-        # Convert between currencies
-        salary_us_to_inr = salary_pred_us * usd_to_inr
-        salary_in_to_us = salary_pred_in / usd_to_inr
     except Exception:
-        st.warning('⚠️ Could not fetch real-time USD to INR conversion.')
+        st.warning('⚠️ Could not fetch real-time USD/INR conversion rates.')
 
 # Batch prediction
 st.markdown('---')
@@ -262,10 +270,25 @@ if uploaded_file is not None:
             batch_data[col] = 0  # Default value for missing columns
     batch_data = batch_data[expected_cols]
     batch_preds = model.predict(batch_data)
-    # Real-time conversion for batch
+    # Show real-time USD to INR and INR to USD rate
     try:
-        response = requests.get('https://api.exchangerate.host/latest?base=USD')
-        usd_to_inr = response.json()['rates']['INR']
+        response_usd = requests.get('https://api.exchangerate.host/latest?base=USD')
+        response_inr = requests.get('https://api.exchangerate.host/latest?base=INR')
+        usd_to_inr = response_usd.json()['rates'].get('INR', None)
+        inr_to_usd = response_inr.json()['rates'].get('USD', None)
+        rate_msg = ""
+        if usd_to_inr:
+            rate_msg += f"Real-time USD to INR Rate: <b>₹{usd_to_inr:,.2f}</b><br>"
+        else:
+            rate_msg += "USD to INR rate unavailable.<br>"
+        if inr_to_usd:
+            rate_msg += f"Real-time INR to USD Rate: <b>${inr_to_usd:,.4f}</b>"
+        else:
+            rate_msg += "INR to USD rate unavailable."
+        st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>{rate_msg}</span></div>", unsafe_allow_html=True)
+        st.balloons()
+    except Exception:
+        st.warning('⚠️ Could not fetch real-time USD/INR conversion rates.')
         # Convert between currencies
         salary_us_to_inr = salary_pred_us * usd_to_inr
         salary_in_to_us = salary_pred_in / usd_to_inr
