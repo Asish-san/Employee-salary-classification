@@ -106,6 +106,13 @@ st.markdown("<span style='font-size:12px; color:#888; margin-left:10px;'>Employe
 st.title('💼 Employee Salary Prediction App')
 st.markdown('<h3 style="color:#43c6ac;">Predict salary, compare models, and see real-time USD to INR conversion!</h3>', unsafe_allow_html=True)
 
+# Add custom CSS
+hide_github_icon = """
+#GithubIcon {
+  visibility: hidden;
+}
+"""
+st.markdown(hide_github_icon, unsafe_allow_html=True)
 
 # Load trained model
 model = joblib.load('best_model.pkl')
@@ -387,8 +394,7 @@ st.image('logoasish.png', width=40)
 st.markdown("</div>", unsafe_allow_html=True)
 st.markdown("""
 <div class='footer'>
-    <span>Created by <b>Asish Kumar</b> | 
-    <a class='github-link' href='https://github.com/Asish-san' target='_blank'>Follow me on GitHub</a>
+    <span>Created by <b>Asish Kumar</b> |
     <br>
     <span style='color:#43c6ac;'>Streamlit Web App</span> &nbsp; <span style='font-size:24px;'>🌐</span>
     <br>
