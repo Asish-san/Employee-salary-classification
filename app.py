@@ -229,12 +229,10 @@ if st.button('🚀 Predict Salary'):
         st.success(f'💰 Predicted Salary (Indian Market): ₹{salary_pred_in:,.2f} INR')
     # Show real-time USD to INR and INR to USD rate
     try:
-        response_usd = requests.get('https://api.exchangerate.host/latest?base=USD')
-        response_inr = requests.get('https://api.exchangerate.host/latest?base=INR')
+        response_usd = requests.get('https://open.er-api.com/v6/latest/USD')
         usd_json = response_usd.json()
-        inr_json = response_inr.json()
         usd_to_inr = usd_json.get('rates', {}).get('INR', None)
-        inr_to_usd = inr_json.get('rates', {}).get('USD', None)
+        inr_to_usd = 1 / usd_to_inr if usd_to_inr else None
         rate_msg = ""
         if usd_to_inr:
             rate_msg += f"Real-time USD to INR Rate: <b>₹{usd_to_inr:,.2f}</b><br>"
@@ -243,7 +241,7 @@ if st.button('🚀 Predict Salary'):
         if inr_to_usd:
             rate_msg += f"Real-time INR to USD Rate: <b>${inr_to_usd:,.4f}</b>"
         else:
-            rate_msg += f"INR to USD rate unavailable. Response: {inr_json}"
+            rate_msg += "INR to USD rate unavailable."
         st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>{rate_msg}</span></div>", unsafe_allow_html=True)
         st.balloons()
     except Exception as e:
@@ -274,15 +272,15 @@ if uploaded_file is not None:
     batch_preds = model.predict(batch_data)
     # Show real-time USD to INR and INR to USD rate
     try:
-        response_usd = requests.get('https://api.exchangerate.host/latest?base=USD')
-        response_inr = requests.get('https://api.exchangerate.host/latest?base=INR')
-        usd_to_inr = response_usd.json()['rates'].get('INR', None)
-        inr_to_usd = response_inr.json()['rates'].get('USD', None)
+        response_usd = requests.get('https://open.er-api.com/v6/latest/USD')
+        usd_json = response_usd.json()
+        usd_to_inr = usd_json.get('rates', {}).get('INR', None)
+        inr_to_usd = 1 / usd_to_inr if usd_to_inr else None
         rate_msg = ""
         if usd_to_inr:
             rate_msg += f"Real-time USD to INR Rate: <b>₹{usd_to_inr:,.2f}</b><br>"
         else:
-            rate_msg += "USD to INR rate unavailable.<br>"
+            rate_msg += f"USD to INR rate unavailable. Response: {usd_json}<br>"
         if inr_to_usd:
             rate_msg += f"Real-time INR to USD Rate: <b>${inr_to_usd:,.4f}</b>"
         else:
