@@ -164,6 +164,20 @@ if st.button('🚀 Predict Salary'):
     """, unsafe_allow_html=True)
     # 🎈 Balloon effect when salary is predicted
     st.balloons()
+    # Play music when salary is predicted
+    import base64
+    music_file = 'assets/success.mp3'  # Place your music file in assets folder
+    try:
+        with open(music_file, 'rb') as f:
+            music_bytes = f.read()
+        music_base64 = base64.b64encode(music_bytes).decode()
+        st.markdown(f"""
+        <audio autoplay>
+            <source src="data:audio/mp3;base64,{music_base64}" type="audio/mp3">
+        </audio>
+        """, unsafe_allow_html=True)
+    except Exception:
+        st.info('Music file not found or could not be played.')
     
     # Market standard payout mapping for jobs (researched)
     us_market_payout = {
