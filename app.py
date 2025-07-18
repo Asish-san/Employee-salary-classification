@@ -96,7 +96,7 @@ st.markdown("<div style='display:flex; align-items:center;'>", unsafe_allow_html
 st.image('logo.png', width=40)
 st.markdown("<span style='font-size:12px; color:#888; margin-left:10px;'>Employee Salary Prediction</span></div>", unsafe_allow_html=True)
 st.title('💼 Employee Salary Prediction App')
-st.markdown('<h3 style="color:#43c6ac;">Predict salary, compare models, and see real-time USD to INR conversion!</h3>', unsafe_allow_html=True)
+st.markdown('<h3 style="color:#43c6ac;">Predict individual and batch salary prediction along with statistical analysis!</h3>', unsafe_allow_html=True)
 
 
 # Load trained model
@@ -163,8 +163,6 @@ st.markdown(f"<h4>🏆 <span style='color:#43c6ac'>Best Model:</span> {best_mode
 st.markdown("<div style='display:flex; justify-content:center; align-items:center;'>", unsafe_allow_html=True)
 st.image('assets/model_performance.png', caption='Model Performance Comparison', width=500)
 st.markdown("</div>", unsafe_allow_html=True)
-# Show model performance PNG
-st.image('assets/model_performance.png', caption='Model Performance Comparison', width=500)
 
 # Predict button with animation
 if st.button('🚀 Predict Salary'):
