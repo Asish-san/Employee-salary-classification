@@ -302,5 +302,5 @@ st.markdown("""
     </span>
 </div>
 <div style='text-align:center; font-size:14px; color:#888; margin-top:10px;'>© 2025 Asish Rout, All rights reserved.</div>
+<div style='text-align:center; font-size:14px; color:#888; margin-top:10px;'> © 2025 Asish Rout, All rights reserved.</div>
 """, unsafe_allow_html=True)
-<div style='text-align:center; font-size:14px; color:#888; margin-top:10px;'>© 2025 Asish Rout, All rights reserved.</div>
