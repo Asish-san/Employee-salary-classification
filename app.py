@@ -180,11 +180,20 @@ if st.button('🚀 Predict Salary'):
         'Protective-serv': (400000, 950000),
         'Armed-Forces': (400000, 1200000)
     }
-    # AI logic for jobs not in mapping
+    # Use AI logic for jobs not in mapping
     def ai_job_payout(job, market):
         # Example: Use experience and education to estimate
-        base_us = 35000 + (experience * 1000) + (education * 2000)
-        base_in = 350000 + (experience * 20000) + (education * 40000)
+        edu_map = {
+            'HS-grad': 1,
+            'Assoc': 2,
+            'Some-college': 3,
+            'Bachelors': 4,
+            'Masters': 5,
+            'PhD': 6
+        }
+        edu_num = edu_map.get(education, 3)  # Default to 'Some-college' if not found
+        base_us = 35000 + (experience * 1000) + (edu_num * 2000)
+        base_in = 350000 + (experience * 20000) + (edu_num * 40000)
         if market == 'USD':
             return (base_us, base_us + 20000)
         else:
