@@ -211,36 +211,31 @@ if st.button('🚀 Predict Salary'):
 
     # Get selected job title
     job = job_title
-    salary_pred = model.predict(input_df)[0]
-    # Get real-time USD to INR rate
-    try:
-        response = requests.get('https://api.exchangerate-api.com/v4/latest/USD')
-        usd_to_inr = response.json()['rates']['INR']
-    except Exception:
-        usd_to_inr = 83.0  # fallback value
-    # US market prediction
-    payout_range = us_market_payout.get(job, ai_job_payout(job, exp_num, edu_num, 'USD'))
-    salary_pred_us = min(max(salary_pred, payout_range_us[0]), payout_range_us[1])
-    # Indian market prediction
-    payout_range_in = in_market_payout.get(job, ai_job_payout(job, 'INR'))
-    salary_pred_in = min(max(salary_pred, payout_range_in[0]), payout_range_in[1])
-    # Convert between currencies
-    salary_us_to_inr = salary_pred_us * usd_to_inr
-    salary_in_to_us = salary_pred_in / usd_to_inr
+    # Map education to its index for ai_job_payout
+    edu_list = ['Bachelors', 'Masters', 'PhD', 'HS-grad', 'Assoc', 'Some-college']
+    edu_num = edu_list.index(education) if education in edu_list else 3
+    exp_num = experience
     if currency.startswith('USD'):
+        payout_range = us_market_payout.get(job, ai_job_payout(job, exp_num, edu_num, 'USD'))
+        salary_pred = model.predict(input_df)[0]
+        # Scale prediction to market range
+        salary_pred_us = min(max(salary_pred, payout_range[0]), payout_range[1])
         st.success(f'💰 Predicted Salary (US Market): ${salary_pred_us:,.2f} USD')
-        st.info(f'Equivalent in INR: ₹{salary_us_to_inr:,.2f}')
     else:
+        payout_range = in_market_payout.get(job, ai_job_payout(job, exp_num, edu_num, 'INR'))
+        salary_pred = model.predict(input_df)[0]
+        # Scale prediction to market range
+        salary_pred_in = min(max(salary_pred, payout_range[0]), payout_range[1])
         st.success(f'💰 Predicted Salary (Indian Market): ₹{salary_pred_in:,.2f} INR')
-        st.info(f'Equivalent in USD: ${salary_in_to_us:,.2f}')
-    st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>Real-time USD to INR Rate: <b>₹{usd_to_inr:,.2f}</b></span></div>", unsafe_allow_html=True)
-    st.balloons()
     # Show real-time USD to INR rate
     try:
         response = requests.get('https://api.exchangerate-api.com/v4/latest/USD')
         usd_to_inr = response.json()['rates']['INR']
         st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>Real-time USD to INR Rate: <b>₹{usd_to_inr:,.2f}</b></span></div>", unsafe_allow_html=True)
         st.balloons()
+        # Convert between currencies
+        salary_us_to_inr = salary_pred_us * usd_to_inr
+        salary_in_to_us = salary_pred_in / usd_to_inr
     except Exception:
         st.warning('⚠️ Could not fetch real-time USD to INR conversion.')
 
