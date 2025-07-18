@@ -310,7 +310,7 @@ st.markdown("""
     <br>
     <span style='color:#43c6ac;'>Streamlit Web App</span> &nbsp; <span style='font-size:24px;'>🌐</span>
     <br>
-    <span style='font-size:14px;'><b>© 2025 Asish Kumar. All rights reserved.<br>This app and its contents are protected under copyright and anti-plagiarism systems. Unauthorized copying, distribution, or use may be detected and flagged. For more info, see <a href='https://docs.github.com/en/site-policy/content-removal-policies/github-copyright-policy' target='_blank'>GitHub Copyright Policy</a>.</b></span>
+    <span style='font-size:14px;'><b>© 2025 Asish Kumar. All rights reserved.</b></span>
     </span>
 </div>
 """, unsafe_allow_html=True)
