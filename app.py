@@ -93,7 +93,7 @@ st.set_page_config(
 )
 
 st.markdown("<div style='display:flex; align-items:center;'>", unsafe_allow_html=True)
-st.image('assets/logo.png', width=40)
+st.image('logo.png', width=40)
 st.markdown("<span style='font-size:12px; color:#888; margin-left:10px;'>Employee Salary Prediction</span></div>", unsafe_allow_html=True)
 st.title('💼 Employee Salary Prediction App')
 st.markdown('<h3 style="color:#43c6ac;">Predict salary, compare models, and see real-time USD to INR conversion!</h3>', unsafe_allow_html=True)
@@ -281,7 +281,7 @@ st.markdown("""
 # Footer with author info and logo
 st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown("<div style='display:flex; justify-content:center; align-items:center;'>", unsafe_allow_html=True)
-st.image('assets/logoasish.png', width=40)
+st.image('logoasish.png', width=40)
 st.markdown("</div>", unsafe_allow_html=True)
 st.markdown("""
 <div class='footer'>
