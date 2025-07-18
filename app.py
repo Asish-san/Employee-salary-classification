@@ -229,7 +229,7 @@ if st.button('🚀 Predict Salary'):
         st.success(f'💰 Predicted Salary (Indian Market): ₹{salary_pred_in:,.2f} INR')
     # Show real-time USD to INR rate
     try:
-        response = requests.get('https://api.exchangerate-api.com/v4/latest/USD')
+        response = requests.get('https://api.exchangerate.host/latest?base=USD')
         usd_to_inr = response.json()['rates']['INR']
         st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>Real-time USD to INR Rate: <b>₹{usd_to_inr:,.2f}</b></span></div>", unsafe_allow_html=True)
         st.balloons()
@@ -264,8 +264,11 @@ if uploaded_file is not None:
     batch_preds = model.predict(batch_data)
     # Real-time conversion for batch
     try:
-        response = requests.get('https://api.exchangerate-api.com/v4/latest/USD')
+        response = requests.get('https://api.exchangerate.host/latest?base=USD')
         usd_to_inr = response.json()['rates']['INR']
+        # Convert between currencies
+        salary_us_to_inr = salary_pred_us * usd_to_inr
+        salary_in_to_us = salary_pred_in / usd_to_inr
         # AI-based market standard payout mapping for jobs
         us_market_payout = {
             'Tech-support': (35000, 65000),
