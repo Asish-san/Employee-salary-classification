@@ -282,6 +282,89 @@ if uploaded_file is not None:
         usd_to_inr = response.json()['rates']['INR']
         batch_data['PredictedSalaryUSD'] = batch_preds
         batch_data['PredictedSalaryINR'] = batch_preds * usd_to_inr
+        # AI-based market standard payout mapping for jobs
+        us_market_payout = {
+            'Tech-support': (35000, 65000),
+            'Craft-repair': (40000, 70000),
+            'Other-service': (30000, 55000),
+            'Sales': (40000, 90000),
+            'Exec-managerial': (80000, 120000),
+            'Prof-specialty': (70000, 110000),
+            'Handlers-cleaners': (25000, 40000),
+            'Machine-op-inspct': (35000, 60000),
+            'Adm-clerical': (35000, 55000),
+            'Farming-fishing': (25000, 45000),
+            'Transport-moving': (35000, 60000),
+            'Priv-house-serv': (25000, 40000),
+            'Protective-serv': (40000, 70000),
+            'Armed-Forces': (40000, 90000)
+        }
+        in_market_payout = {
+            'Tech-support': (350000, 900000),
+            'Craft-repair': (400000, 950000),
+            'Other-service': (300000, 700000),
+            'Sales': (400000, 1200000),
+            'Exec-managerial': (1200000, 5000000),
+            'Prof-specialty': (1000000, 4000000),
+            'Handlers-cleaners': (250000, 600000),
+            'Machine-op-inspct': (350000, 900000),
+            'Adm-clerical': (350000, 800000),
+            'Farming-fishing': (250000, 600000),
+            'Transport-moving': (350000, 900000),
+            'Priv-house-serv': (250000, 600000),
+            'Protective-serv': (400000, 950000),
+            'Armed-Forces': (400000, 1200000)
+        }
+        def ai_job_payout(job, edu, exp, market):
+            edu_map = {
+                'HS-grad': 1,
+                'Assoc': 2,
+                'Some-college': 3,
+                'Bachelors': 4,
+                'Masters': 5,
+                'PhD': 6
+            }
+            edu_num = edu_map.get(edu, 3)
+            base_us = 35000 + (exp * 1000) + (edu_num * 2000)
+            base_in = 350000 + (exp * 20000) + (edu_num * 40000)
+            if market == 'USD':
+                return (base_us, base_us + 20000)
+            else:
+                return (base_in, base_in + 200000)
+
+        pred_usd = []
+        pred_inr = []
+        # For each row, apply market capping and AI logic if needed
+        for idx, row in batch_data.iterrows():
+            # Get original job/edu/exp from uploaded data if available
+            job = row.get('Job Title', None)
+            edu = row.get('Education Level', None)
+            exp = row.get('Years of Experience', 0)
+            # Try to map back encoded values to string for job/edu
+            if isinstance(job, int) and 0 <= job < len(le_job.classes_):
+                job_str = le_job.classes_[job]
+            elif isinstance(job, str):
+                job_str = job
+            else:
+                job_str = None
+            if isinstance(edu, int) and 0 <= edu < len(le_edu.classes_):
+                edu_str = le_edu.classes_[edu]
+            elif isinstance(edu, str):
+                edu_str = edu
+            else:
+                edu_str = None
+            # Get model prediction
+            pred = batch_preds[idx]
+            # US market
+            payout_us = us_market_payout.get(job_str, ai_job_payout(job_str, edu_str, exp, 'USD'))
+            pred_us = min(max(pred, payout_us[0]), payout_us[1])
+            # IN market
+            payout_in = in_market_payout.get(job_str, ai_job_payout(job_str, edu_str, exp, 'INR'))
+            pred_in = min(max(pred, payout_in[0]), payout_in[1])
+            pred_usd.append(pred_us)
+            pred_inr.append(pred_in)
+        batch_data['PredictedSalaryUSD'] = pred_usd
+        batch_data['PredictedSalaryINR'] = [x * usd_to_inr for x in pred_usd]
     except Exception:
         batch_data['PredictedSalaryUSD'] = batch_preds
         batch_data['PredictedSalaryINR'] = 'N/A'
