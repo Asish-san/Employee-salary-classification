@@ -59,6 +59,7 @@ st.markdown("""
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-image: linear-gradient(90deg, #222 0%, #444 100%);
+        color: #222;
     }
         background: linear-gradient(90deg, #fc00ff 0%, #f6d365 50%, #43c6ac 100%);
         color: white;
