@@ -99,67 +99,46 @@ best_model_name = best_model_info[0].split(': ')[1]
 best_r2 = float(best_model_info[1].split(': ')[1])
 
 # Sidebar inputs
+# Sidebar inputs
 st.sidebar.header('👤 Input Employee Details')
 age = st.sidebar.slider('Age', 18, 65, 30)
 gender = st.sidebar.selectbox('Gender', ['Male', 'Female'])
-education_options = ['Bachelors', 'Masters', 'PhD', 'HS-grad', 'Assoc', 'Some-college', 'Custom']
+education_options = ['Bachelors', 'Masters', 'PhD', 'HS-grad', 'Assoc', 'Some-college']
 education = st.sidebar.selectbox('Education Level', education_options)
-custom_education = st.sidebar.text_input('Custom Education (if not listed)', '') if education == 'Custom' else ''
 job_options = ['Tech-support', 'Craft-repair', 'Other-service', 'Sales',
     'Exec-managerial', 'Prof-specialty', 'Handlers-cleaners', 'Machine-op-inspct',
     'Adm-clerical', 'Farming-fishing', 'Transport-moving', 'Priv-house-serv',
-    'Protective-serv', 'Armed-Forces', 'Custom']
+    'Protective-serv', 'Armed-Forces']
 job_title = st.sidebar.selectbox('Job Title', job_options)
-custom_job = st.sidebar.text_input('Custom Job Title (if not listed)', '') if job_title == 'Custom' else ''
 experience = st.sidebar.slider('Years of Experience', 0, 40, 5)
 # Currency selection
 currency = st.sidebar.radio('Select Market Currency', ['USD (US Market)', 'INR (Indian Market)'])
 
 
 # Input DataFrame (must match training features)
-input_edu = custom_education if education == 'Custom' and custom_education else education
-input_job = custom_job if job_title == 'Custom' and custom_job else job_title
+input_edu = education
+input_job = job_title
 
-# Efficiently encode categorical features to match model training
-from sklearn.preprocessing import LabelEncoder
-le_edu = LabelEncoder()
-le_job = LabelEncoder()
-
-le_edu.fit([
-    'Bachelors', 'Masters', 'PhD', 'HS-grad', 'Assoc', 'Some-college', 'Custom'
-])
-le_job.fit([
-    'Tech-support', 'Craft-repair', 'Other-service', 'Sales',
-    'Exec-managerial', 'Prof-specialty', 'Handlers-cleaners', 'Machine-op-inspct',
-    'Adm-clerical', 'Farming-fishing', 'Transport-moving', 'Priv-house-serv',
-    'Protective-serv', 'Armed-Forces', 'Custom'
-])
-# Map unseen education/job to 'Custom' for LabelEncoder
-def safe_label(val, classes):
-    return val if val in classes else 'Custom'
-input_df = pd.DataFrame({
-    'Age': [age],
-    'Gender': [1 if gender == 'Male' else 0],
-    'Education Level': [safe_label(input_edu, le_edu.classes_)],
-    'Job Title': [safe_label(input_job, le_job.classes_)],
-    'Years of Experience': [experience]})
-input_df['Education Level'] = le_edu.transform(input_df['Education Level'])
-input_df['Job Title'] = le_job.transform(input_df['Job Title'])
 # Encode categorical features to match model training
 from sklearn.preprocessing import LabelEncoder
 le_edu = LabelEncoder()
 le_job = LabelEncoder()
-# Fit encoders on all possible values (should match training)
 le_edu.fit([
-    'Bachelors', 'Masters', 'PhD', 'HS-grad', 'Assoc', 'Some-college', 'Custom'
+    'Bachelors', 'Masters', 'PhD', 'HS-grad', 'Assoc', 'Some-college'
 ])
 le_job.fit([
     'Tech-support', 'Craft-repair', 'Other-service', 'Sales',
     'Exec-managerial', 'Prof-specialty', 'Handlers-cleaners', 'Machine-op-inspct',
     'Adm-clerical', 'Farming-fishing', 'Transport-moving', 'Priv-house-serv',
-    'Protective-serv', 'Armed-Forces', 'Custom'
+    'Protective-serv', 'Armed-Forces'
 ])
-# Already mapped above, so no error will occur
+input_df = pd.DataFrame({
+    'Age': [age],
+    'Gender': [1 if gender == 'Male' else 0],
+    'Education Level': [input_edu],
+    'Job Title': [input_job],
+    'Years of Experience': [experience]
+})
 input_df['Education Level'] = le_edu.transform(input_df['Education Level'])
 input_df['Job Title'] = le_job.transform(input_df['Job Title'])
 
