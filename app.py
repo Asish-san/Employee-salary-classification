@@ -385,6 +385,7 @@ if uploaded_file is not None:
             batch_data.at[idx, 'PredictedSalaryUSD_from_INR'] = pred_in_to_us
             batch_data.at[idx, 'PredictedSalaryINR_from_USD'] = pred_us_to_inr
     except Exception:
+        # Fallback: just use model predictions
         batch_data['PredictedSalaryUSD'] = batch_preds
         batch_data['PredictedSalaryINR'] = 'N/A'
     st.write('✅ Predictions:')
