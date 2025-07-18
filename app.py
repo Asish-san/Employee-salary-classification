@@ -227,6 +227,7 @@ if st.button('🚀 Predict Salary'):
         # Scale prediction to market range
         salary_pred_in = min(max(salary_pred, payout_range[0]), payout_range[1])
         st.success(f'💰 Predicted Salary (Indian Market): ₹{salary_pred_in:,.2f} INR')
+        salary_pred_in = None
     # Show real-time USD to INR and INR to USD rate
     try:
         response_usd = requests.get('https://open.er-api.com/v6/latest/USD')
@@ -403,9 +404,10 @@ st.image('logoasish.png', width=40)
 st.markdown("</div>", unsafe_allow_html=True)
 st.markdown("""
 <div class='footer'>
-    <span>Created by <b>Asish Kumar</b> 
+    <span>Created by <b>Asish Rout</b> 
     <br>
     <span style='color:#43c6ac;'>Streamlit Web App</span> &nbsp; <span style='font-size:24px;'>🌐</span>
     </span>
 </div>
+<div style='text-align:center; font-size:14px; color:#888; margin-top:10px;'>© 2025 Asish Rout, All rights reserved.</div>
 """, unsafe_allow_html=True)
