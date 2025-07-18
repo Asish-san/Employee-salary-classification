@@ -17,18 +17,49 @@ st.markdown("""
         75% {background: linear-gradient(120deg, #fc00ff 0%, #00dbde 100%);}
         100% {background: linear-gradient(120deg, #f6d365 0%, #fdc094 25%, #fda085 50%, #a1c4fd 75%, #c2e9fb 100%);}
     }
-    .main {
-        background: linear-gradient(135deg, #f8ffae 0%, #43c6ac 25%, #fc00ff 50%, #00dbde 75%, #f093fb 100%);
-        border-radius: 22px;
-        box-shadow: 0 6px 32px rgba(252,0,255,0.18);
-        padding: 20px;
-        animation: fadeIn 2s;
+    .footer {
+        text-align: center;
+        font-size: 22px;
+        margin-top: 40px;
+        background: linear-gradient(90deg, #fc00ff, #43e97b, #f093fb, #f5576c);
+        background-size: 200% 200%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: gradientText 3s ease-in-out infinite;
     }
-    @keyframes fadeIn {
-        from {opacity: 0;}
-        to {opacity: 1;}
+    @keyframes gradientText {
+        0% {background-position: 0% 50%;}
+        50% {background-position: 100% 50%;}
+        100% {background-position: 0% 50%;}
+    }
+    .gradient-box {
+        background: linear-gradient(135deg, #fc00ff 0%, #43e97b 100%);
+        border-radius: 24px;
+        padding: 32px 24px;
+        margin-bottom: 24px;
+        opacity: 0.75;
+        box-shadow: 0 4px 24px rgba(252,0,255,0.12);
+    }
+    .gradient-input {
+        background: linear-gradient(135deg, #f8ffae 0%, #fc00ff 100%);
+        border-radius: 18px;
+        padding: 18px 12px;
+        opacity: 0.75;
+        box-shadow: 0 2px 12px rgba(252,0,255,0.10);
+        margin-bottom: 18px;
     }
     .stButton>button {
+        background: linear-gradient(90deg, #fc00ff 0%, #f6d365 50%, #43c6ac 100%);
+        font-weight: bold;
+        border-radius: 10px;
+        box-shadow: 0 2px 12px rgba(252,0,255,0.18);
+        transition: transform 0.2s;
+        color: transparent;
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-image: linear-gradient(90deg, #222 0%, #444 100%);
+    }
         background: linear-gradient(90deg, #fc00ff 0%, #f6d365 50%, #43c6ac 100%);
         color: white;
         font-weight: bold;
