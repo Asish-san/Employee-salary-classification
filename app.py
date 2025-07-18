@@ -27,7 +27,7 @@ st.markdown("""
         to {opacity: 1;}
     }
     .stButton>button {
-        background: linear-gradient(90deg, #2193b0 0%, #6dd5ed 100%);
+        background: linear-gradient(90deg, #fc00ff 0%, #00dbde 100%);
         color: white;
         font-weight: bold;
         border-radius: 10px;
@@ -88,12 +88,12 @@ st.markdown("""
 # Set Streamlit page config with custom logo
 st.set_page_config(
     page_title='Employee Salary Prediction',
-    page_icon='logo.png',
+    page_icon='logo_salary_app.png',
     layout='centered'
 )
 
 st.markdown("<div style='display:flex; align-items:center;'>", unsafe_allow_html=True)
-st.image('logo.png', width=40)
+st.image('logo_salary_app.png', width=40)
 st.markdown("<span style='font-size:12px; color:#888; margin-left:10px;'>Employee Salary Prediction</span></div>", unsafe_allow_html=True)
 st.title('💼 Employee Salary Prediction App')
 st.markdown('<h3 style="color:#43c6ac;">Predict salary, compare models, and see real-time USD to INR conversion!</h3>', unsafe_allow_html=True)
@@ -163,6 +163,8 @@ st.markdown(f"<h4>🏆 <span style='color:#43c6ac'>Best Model:</span> {best_mode
 st.markdown("<div style='display:flex; justify-content:center; align-items:center;'>", unsafe_allow_html=True)
 st.image('assets/model_performance.png', caption='Model Performance Comparison', width=500)
 st.markdown("</div>", unsafe_allow_html=True)
+# Show model performance PNG
+st.image('assets/model_performance.png', caption='Model Performance Comparison', width=500)
 
 # Predict button with animation
 if st.button('🚀 Predict Salary'):
@@ -199,7 +201,8 @@ if st.button('🚀 Predict Salary'):
         'Protective-serv': (400000, 950000),
         'Armed-Forces': (400000, 1200000)
     }
-     # Use AI logic for jobs not in mapping
+
+    # Use AI logic for jobs not in mapping
     def ai_market_payout(job, experience, education, market):
         # Example: Use experience and education to estimate
         base_us = 35000 + (experience * 1000) + (education * 2000)
@@ -213,43 +216,39 @@ if st.button('🚀 Predict Salary'):
     job = job_title
     # Map education to its index for ai_job_payout
     edu_list = ['Bachelors', 'Masters', 'PhD', 'HS-grad', 'Assoc', 'Some-college']
-    edu = edu_list.index(education) if education in edu_list else 3
-    exp = experience
+    edu_num = edu_list.index(education) if education in edu_list else 3
+    exp_num = experience
     if currency.startswith('USD'):
-        payout_range = us_market_payout.get(job, ai_market_payout(job, exp, edu, 'USD'))
+        payout_range = us_market_payout.get(job, ai_market_payout(job, exp_num, edu_num, 'USD'))
         salary_pred = model.predict(input_df)[0]
         # Scale prediction to market range
         salary_pred_us = min(max(salary_pred, payout_range[0]), payout_range[1])
         st.success(f'💰 Predicted Salary (US Market): ${salary_pred_us:,.2f} USD')
+        salary_pred_in = None
     else:
-        payout_range = in_market_payout.get(job, ai_market_payout(job, exp, edu, 'INR'))
+        payout_range = in_market_payout.get(job, ai_market_payout(job, exp_num, edu_num, 'INR'))
         salary_pred = model.predict(input_df)[0]
         # Scale prediction to market range
         salary_pred_in = min(max(salary_pred, payout_range[0]), payout_range[1])
         st.success(f'💰 Predicted Salary (Indian Market): ₹{salary_pred_in:,.2f} INR')
-        salary_pred_in = None
-    # Show real-time USD to INR and INR to USD rate
-    try:
-        response_usd = requests.get('https://open.er-api.com/v6/latest/USD')
-        usd_json = response_usd.json()
-        usd_to_inr = usd_json.get('rates', {}).get('INR', None)
-        inr_to_usd = 1 / usd_to_inr if usd_to_inr else None
-        rate_msg = ""
-        # Convert between currencies
-        salary_us_to_inr = salary_pred_us * usd_to_inr
-        salary_in_to_us = salary_pred_in / usd_to_inr
-        if usd_to_inr:
-            rate_msg += f"Real-time USD to INR Rate: <b>₹{usd_to_inr:,.2f}</b><br>"
-        else:
-            rate_msg += f"USD to INR rate unavailable. Response: {usd_json}<br>"
-        if inr_to_usd:
-            rate_msg += f"Real-time INR to USD Rate: <b>${inr_to_usd:,.4f}</b>"
-        else:
-            rate_msg += "INR to USD rate unavailable."
-        st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>{rate_msg}</span></div>", unsafe_allow_html=True)
-        st.balloons()
-    except Exception as e:
-        st.warning(f'⚠️ Could not fetch real-time USD/INR conversion rates. Error: {e}')
+    # Show salary statistics for the predicted salary
+    import numpy as np
+    if currency.startswith('USD'):
+        stats = {
+            'Min': payout_range[0],
+            'Max': payout_range[1],
+            'Mean': np.mean(payout_range),
+            'Median': np.median(payout_range)
+        }
+        st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>US Market Salary Stats:<br>Min: ${stats['Min']:,.2f} | Max: ${stats['Max']:,.2f} | Mean: ${stats['Mean']:,.2f} | Median: ${stats['Median']:,.2f}</span></div>", unsafe_allow_html=True)
+    else:
+        stats = {
+            'Min': payout_range[0],
+            'Max': payout_range[1],
+            'Mean': np.mean(payout_range),
+            'Median': np.median(payout_range)
+        }
+        st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>Indian Market Salary Stats:<br>Min: ₹{stats['Min']:,.2f} | Max: ₹{stats['Max']:,.2f} | Mean: ₹{stats['Mean']:,.2f} | Median: ₹{stats['Median']:,.2f}</span></div>", unsafe_allow_html=True)
 
 # Batch prediction
 st.markdown('---')
@@ -265,130 +264,28 @@ if uploaded_file is not None:
         batch_data['Education Level'] = batch_data['Education Level'].map(edu_map).fillna(-1).astype(int)
     if 'Job Title' in batch_data.columns:
         batch_data['Job Title'] = batch_data['Job Title'].map(job_map).fillna(-1).astype(int)
-    if 'Gender' in batch_data.columns:
-        batch_data['Gender'] = batch_data['Gender'].map({'Male': 1, 'Female': 0})
-    # Align columns to match model training features
-    expected_cols = ['Age', 'Gender', 'Education Level', 'Job Title', 'Years of Experience']
-    for col in expected_cols:
-        if col not in batch_data.columns:
-            batch_data[col] = 0  # Default value for missing columns
-    batch_data = batch_data[expected_cols]
-    batch_preds = model.predict(batch_data)
-    # Show real-time USD to INR and INR to USD rate
-    try:
-        response_usd = requests.get('https://open.er-api.com/v6/latest/USD')
-        usd_json = response_usd.json()
-        usd_to_inr = usd_json.get('rates', {}).get('INR', None)
-        inr_to_usd = 1 / usd_to_inr if usd_to_inr else None
-        rate_msg = ""
-        # Convert between currencies
-        salary_us_to_inr = salary_pred_us * usd_to_inr
-        salary_in_to_us = salary_pred_in / usd_to_inr
-        if usd_to_inr:
-            rate_msg += f"Real-time USD to INR Rate: <b>₹{usd_to_inr:,.2f}</b><br>"
-        else:
-            rate_msg += f"USD to INR rate unavailable. Response: {usd_json}<br>"
-        if inr_to_usd:
-            rate_msg += f"Real-time INR to USD Rate: <b>${inr_to_usd:,.4f}</b>"
-        else:
-            rate_msg += "INR to USD rate unavailable."
-        st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>{rate_msg}</span></div>", unsafe_allow_html=True)
-        st.balloons()
-    except Exception:
-        st.warning('⚠️ Could not fetch real-time USD/INR conversion rates.')
-        # Convert between currencies
-        salary_us_to_inr = salary_pred_us * usd_to_inr
-        salary_in_to_us = salary_pred_in / usd_to_inr
-        # AI-based market standard payout mapping for jobs
-        us_market_payout = {
-            'Tech-support': (35000, 65000),
-            'Craft-repair': (40000, 70000),
-            'Other-service': (30000, 55000),
-            'Sales': (40000, 90000),
-            'Exec-managerial': (80000, 120000),
-            'Prof-specialty': (70000, 110000),
-            'Handlers-cleaners': (25000, 40000),
-            'Machine-op-inspct': (35000, 60000),
-            'Adm-clerical': (35000, 55000),
-            'Farming-fishing': (25000, 45000),
-            'Transport-moving': (35000, 60000),
-            'Priv-house-serv': (25000, 40000),
-            'Protective-serv': (40000, 70000),
-            'Armed-Forces': (40000, 90000)
-        }
-        in_market_payout = {
-            'Tech-support': (350000, 900000),
-            'Craft-repair': (400000, 950000),
-            'Other-service': (300000, 700000),
-            'Sales': (400000, 1200000),
-            'Exec-managerial': (1200000, 5000000),
-            'Prof-specialty': (1000000, 4000000),
-            'Handlers-cleaners': (250000, 600000),
-            'Machine-op-inspct': (350000, 900000),
-            'Adm-clerical': (350000, 800000),
-            'Farming-fishing': (250000, 600000),
-            'Transport-moving': (350000, 900000),
-            'Priv-house-serv': (250000, 600000),
-            'Protective-serv': (400000, 950000),
-            'Armed-Forces': (400000, 1200000)
-        }
-        def ai_job_payout(job, edu, exp, market):
-            edu_map = {
-                'HS-grad': 1,
-                'Assoc': 2,
-                'Some-college': 3,
-                'Bachelors': 4,
-                'Masters': 5,
-                'PhD': 6
-            }
-            edu_num = edu_map.get(edu, 3)
-            base_us = 35000 + (exp * 1000) + (edu_num * 2000)
-            base_in = 350000 + (exp * 20000) + (edu_num * 40000)
-            if market == 'USD':
-                return (base_us, base_us + 20000)
-            else:
-                return (base_in, base_in + 200000)
-        pred_usd = []
-        pred_inr = []
-        # For each row, apply market capping and AI logic if needed
-        for idx, row in batch_data.iterrows():
-            # Get original job/edu/exp from uploaded data if available
-            job = row.get('Job Title', None)
-            edu = row.get('Education Level', None)
-            exp = row.get('Years of Experience', 0)
-            # Try to map back encoded values to string for job/edu
-            if isinstance(job, int) and 0 <= job < len(le_job.classes_):
-                job_str = le_job.classes_[job]
-            elif isinstance(job, str):
-                job_str = job
-            else:
-                job_str = None
-            if isinstance(edu, int) and 0 <= edu < len(le_edu.classes_):
-                edu_str = le_edu.classes_[edu]
-            elif isinstance(edu, str):
-                edu_str = edu
-            else:
-                edu_str = None
-            # Get model prediction
-            pred = batch_preds[idx]
-            # US market
-            payout_us = us_market_payout.get(job_str, ai_job_payout(job_str, edu_str, exp, 'USD'))
-            pred_us = min(max(pred, payout_us[0]), payout_us[1])
-            # IN market
-            payout_in = in_market_payout.get(job_str, ai_job_payout(job_str, edu_str, exp, 'INR'))
-            pred_in = min(max(pred, payout_in[0]), payout_in[1])
-            pred_usd.append(pred_us)
-            pred_inr.append(pred_in)
-        batch_data['PredictedSalaryUSD'] = batch_preds
-        batch_data['PredictedSalaryINR'] = batch_preds * usd_to_inr
-    except Exception:
-        batch_data['PredictedSalaryUSD'] = batch_preds
-        batch_data['PredictedSalaryINR'] = 'N/A'
-    
+    # Salary statistics for batch predictions
+    batch_data['PredictedSalaryUSD'] = model.predict(batch_data)
+    batch_stats = {
+        'Min': batch_data['PredictedSalaryUSD'].min(),
+        'Max': batch_data['PredictedSalaryUSD'].max(),
+        'Mean': batch_data['PredictedSalaryUSD'].mean(),
+        'Median': batch_data['PredictedSalaryUSD'].median()
+    }
     st.write('✅ Predictions:')
     st.dataframe(batch_data.head(), use_container_width=True)
+    st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>Batch Salary Stats:<br>Min: ${batch_stats['Min']:,.2f} | Max: ${batch_stats['Max']:,.2f} | Mean: ${batch_stats['Mean']:,.2f} | Median: ${batch_stats['Median']:,.2f}</span></div>", unsafe_allow_html=True)
     csv = batch_data.to_csv(index=False).encode('utf-8')
     st.download_button('⬇️ Download Predictions CSV', csv, file_name='predicted_salaries.csv', mime='text/csv')
+            pred_inr.append(pred_in)
+        batch_data['PredictedSalaryUSD'] = pred_usd
+        batch_data['PredictedSalaryINR'] = [x * usd_to_inr for x in pred_usd]
+        st.write('✅ Predictions:')
+        st.dataframe(batch_data.head(), use_container_width=True)
+        csv = batch_data.to_csv(index=False).encode('utf-8')
+        st.download_button('⬇️ Download Predictions CSV', csv, file_name='predicted_salaries.csv', mime='text/csv')
+    except Exception as e:
+        st.error(f"Batch prediction failed: {e}")
 
 # Animations and emojis
 st.markdown("""
@@ -400,14 +297,16 @@ st.markdown("""
 # Footer with author info and logo
 st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown("<div style='display:flex; justify-content:center; align-items:center;'>", unsafe_allow_html=True)
-st.image('logoasish.png', width=40)
+st.image('logo_salary_app.png', width=40)
 st.markdown("</div>", unsafe_allow_html=True)
 st.markdown("""
 <div class='footer'>
-    <span>Created by <b>Asish Rout</b> 
+    <span>Created by <b>Asish Kumar</b> | 
+    <a class='github-link' href='https://github.com/Asish-san' target='_blank'>Follow me on GitHub</a>
     <br>
     <span style='color:#43c6ac;'>Streamlit Web App</span> &nbsp; <span style='font-size:24px;'>🌐</span>
     </span>
 </div>
 <div style='text-align:center; font-size:14px; color:#888; margin-top:10px;'>© 2025 Asish Rout, All rights reserved.</div>
 """, unsafe_allow_html=True)
+<div style='text-align:center; font-size:14px; color:#888; margin-top:10px;'>© 2025 Asish Rout, All rights reserved.</div>
