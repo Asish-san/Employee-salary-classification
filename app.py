@@ -284,7 +284,7 @@ st.image('logo.png', width=40)
 st.markdown("</div>", unsafe_allow_html=True)
 st.markdown("""
 <div class='footer'>
-    <span>Created by <b>Asish Kumar</b> | 
+    <span>Created by <b>Asish Rout</b>
     <br>
     <span style='color:#43c6ac;'>Streamlit Web App</span> &nbsp; <span style='font-size:24px;'>🌐</span>
     </span>
