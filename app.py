@@ -217,7 +217,7 @@ if st.button('🚀 Predict Salary'):
     age_num = age
 
     # Predict base salary for US and INR market
-       payout_us = us_market_payout.get(input_job, ai_market_payout(input_job, exp_num, edu_num, 'USD'))
+    payout_us = us_market_payout.get(input_job, ai_market_payout(input_job, exp_num, edu_num, 'USD'))
     payout_in = in_market_payout.get(input_job, ai_market_payout(input_job, exp_num, edu_num, 'INR'))
     salary_pred_us = min(max(model.predict(input_df)[0], payout_us[0]), payout_us[1])
     salary_pred_in = min(max(model.predict(input_df)[0], payout_in[0]), payout_in[1])
