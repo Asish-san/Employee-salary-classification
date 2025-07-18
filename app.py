@@ -313,7 +313,7 @@ if uploaded_file is not None:
         'Adm-clerical', 'Farming-fishing', 'Transport-moving', 'Priv-house-serv',
         'Protective-serv', 'Armed-Forces']
     # Predict INR market salary using AI logic
-    def get_inr_salary(row):
+    def get_inr_salary(row, in_market_payout=in_market_payout, ai_market_payout=ai_market_payout):
         job_idx = row['Job Title']
         job_name = job_list[job_idx] if job_idx < len(job_list) else 'Tech-support'
         edu_idx = row['Education Level'] if row['Education Level'] < len(edu_list) else 0
