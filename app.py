@@ -277,13 +277,7 @@ if uploaded_file is not None:
     st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>Batch Salary Stats:<br>Min: ${batch_stats['Min']:,.2f} | Max: ${batch_stats['Max']:,.2f} | Mean: ${batch_stats['Mean']:,.2f} | Median: ${batch_stats['Median']:,.2f}</span></div>", unsafe_allow_html=True)
     csv = batch_data.to_csv(index=False).encode('utf-8')
     st.download_button('⬇️ Download Predictions CSV', csv, file_name='predicted_salaries.csv', mime='text/csv')
-            pred_inr.append(pred_in)
-        batch_data['PredictedSalaryUSD'] = pred_usd
-        batch_data['PredictedSalaryINR'] = [x * usd_to_inr for x in pred_usd]
-        st.write('✅ Predictions:')
-        st.dataframe(batch_data.head(), use_container_width=True)
-        csv = batch_data.to_csv(index=False).encode('utf-8')
-        st.download_button('⬇️ Download Predictions CSV', csv, file_name='predicted_salaries.csv', mime='text/csv')
+        # ...existing code...
     except Exception as e:
         st.error(f"Batch prediction failed: {e}")
 
