@@ -231,21 +231,23 @@ if st.button('🚀 Predict Salary'):
     try:
         response_usd = requests.get('https://api.exchangerate.host/latest?base=USD')
         response_inr = requests.get('https://api.exchangerate.host/latest?base=INR')
-        usd_to_inr = response_usd.json()['rates'].get('INR', None)
-        inr_to_usd = response_inr.json()['rates'].get('USD', None)
+        usd_json = response_usd.json()
+        inr_json = response_inr.json()
+        usd_to_inr = usd_json.get('rates', {}).get('INR', None)
+        inr_to_usd = inr_json.get('rates', {}).get('USD', None)
         rate_msg = ""
         if usd_to_inr:
             rate_msg += f"Real-time USD to INR Rate: <b>₹{usd_to_inr:,.2f}</b><br>"
         else:
-            rate_msg += "USD to INR rate unavailable.<br>"
+            rate_msg += f"USD to INR rate unavailable. Response: {usd_json}<br>"
         if inr_to_usd:
             rate_msg += f"Real-time INR to USD Rate: <b>${inr_to_usd:,.4f}</b>"
         else:
-            rate_msg += "INR to USD rate unavailable."
+            rate_msg += f"INR to USD rate unavailable. Response: {inr_json}"
         st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>{rate_msg}</span></div>", unsafe_allow_html=True)
         st.balloons()
-    except Exception:
-        st.warning('⚠️ Could not fetch real-time USD/INR conversion rates.')
+    except Exception as e:
+        st.warning(f'⚠️ Could not fetch real-time USD/INR conversion rates. Error: {e}')
 
 # Batch prediction
 st.markdown('---')
