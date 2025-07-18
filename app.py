@@ -213,16 +213,16 @@ if st.button('🚀 Predict Salary'):
     job = job_title
     # Map education to its index for ai_job_payout
     edu_list = ['Bachelors', 'Masters', 'PhD', 'HS-grad', 'Assoc', 'Some-college']
-    edu_num = edu_list.index(education) if education in edu_list else 3
-    exp_num = experience
+    edu = edu_list.index(education) if education in edu_list else 3
+    exp = experience
     if currency.startswith('USD'):
-        payout_range = us_market_payout.get(job, ai_market_payout(job, exp_num, edu_num, 'USD'))
+        payout_range = us_market_payout.get(job, ai_market_payout(job, exp, edu, 'USD'))
         salary_pred = model.predict(input_df)[0]
         # Scale prediction to market range
         salary_pred_us = min(max(salary_pred, payout_range[0]), payout_range[1])
         st.success(f'💰 Predicted Salary (US Market): ${salary_pred_us:,.2f} USD')
     else:
-        payout_range = in_market_payout.get(job, ai_market_payout(job, exp_num, edu_num, 'INR'))
+        payout_range = in_market_payout.get(job, ai_market_payout(job, exp, edu, 'INR'))
         salary_pred = model.predict(input_df)[0]
         # Scale prediction to market range
         salary_pred_in = min(max(salary_pred, payout_range[0]), payout_range[1])
