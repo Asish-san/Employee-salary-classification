@@ -200,7 +200,7 @@ if st.button('🚀 Predict Salary'):
         'Armed-Forces': (400000, 1200000)
     }
     # Use AI logic for jobs not in mapping
-     def ai_job_payout(job, experience, education, market):
+    def ai_job_payout(job, experience, education, market):
         # Example: Use experience and education to estimate
         base_us = 35000 + (experience * 1000) + (education * 2000)
         base_in = 350000 + (experience * 20000) + (education * 40000)
