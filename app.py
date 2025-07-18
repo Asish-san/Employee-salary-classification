@@ -66,7 +66,7 @@ st.markdown("""
 
 
 
-# Set Streamlit page config with custom logo
+# Set Streamlit page config
 st.set_page_config(
     page_title='Employee Salary Prediction',
     page_icon='assets/logo.png',
@@ -140,14 +140,14 @@ st.dataframe(input_df, use_container_width=True)
 # Model R2 score display
 st.markdown('---')
 st.markdown(f"<h4>🏆 <span style='color:#43c6ac'>Best Model:</span> {best_model_name} | <span style='color:#43c6ac'>R² Score:</span> {best_r2:.4f}</h4>", unsafe_allow_html=True)
-# Show model performance PNG centered below the score
+# Show model performance
 st.markdown("<div style='display:flex; justify-content:center; align-items:center;'>", unsafe_allow_html=True)
 st.image('assets/model_performance.png', caption='Model Performance Comparison', width=500)
 st.markdown("</div>", unsafe_allow_html=True)
 
-# Predict button with animation
+# Predict button
 if st.button('🚀 Predict Salary'):
-    # AI-based market standard payout mapping for jobs
+    # payout mapping for jobs
     us_market_payout = {
         'Tech-support': (35000, 65000),
         'Craft-repair': (40000, 70000),
@@ -180,7 +180,7 @@ if st.button('🚀 Predict Salary'):
         'Protective-serv': (400000, 950000),
         'Armed-Forces': (400000, 1200000)
     }
-    # Use AI logic for jobs not in mapping
+    # AI logic for jobs not in mapping
     def ai_job_payout(job, market):
         # Example: Use experience and education to estimate
         base_us = 35000 + (experience * 1000) + (education * 2000)
@@ -190,7 +190,7 @@ if st.button('🚀 Predict Salary'):
         else:
             return (base_in, base_in + 200000)
 
-    # Get selected job title
+    # selected job title
     job = job_title
     if currency.startswith('USD'):
         payout_range = us_market_payout.get(job, ai_job_payout(job, 'USD'))
@@ -250,14 +250,14 @@ if uploaded_file is not None:
     csv = batch_data.to_csv(index=False).encode('utf-8')
     st.download_button('⬇️ Download Predictions CSV', csv, file_name='predicted_salaries.csv', mime='text/csv')
 
-# Animations and emojis
+
 st.markdown("""
     <div style='text-align:center;'>
         <span style='font-size:40px;'>🎉✨🚀💼</span>
     </div>
 """, unsafe_allow_html=True)
 
-# Footer with author info and logo
+# Footer
 st.markdown("<hr>", unsafe_allow_html=True)
 st.markdown("<div style='display:flex; justify-content:center; align-items:center;'>", unsafe_allow_html=True)
 st.image('logoasish.png', width=40)
