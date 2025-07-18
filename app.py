@@ -206,41 +206,64 @@ if st.button('🚀 Predict Salary'):
 
     # Get selected job title
     job = job_title
-    # Map education to its index for ai_job_payout
     edu_list = ['Bachelors', 'Masters', 'PhD', 'HS-grad', 'Assoc', 'Some-college']
     edu_num = edu_list.index(education) if education in edu_list else 3
     exp_num = experience
-    if currency.startswith('USD'):
-        payout_range = us_market_payout.get(job, ai_market_payout(job, exp_num, edu_num, 'USD'))
-        salary_pred = model.predict(input_df)[0]
-        # Scale prediction to market range
-        salary_pred_us = min(max(salary_pred, payout_range[0]), payout_range[1])
-        st.success(f'💰 Predicted Salary (US Market): ${salary_pred_us:,.2f} USD')
-        salary_pred_in = None
-    else:
-        payout_range = in_market_payout.get(job, ai_market_payout(job, exp_num, edu_num, 'INR'))
-        salary_pred = model.predict(input_df)[0]
-        # Scale prediction to market range
-        salary_pred_in = min(max(salary_pred, payout_range[0]), payout_range[1])
-        st.success(f'💰 Predicted Salary (Indian Market): ₹{salary_pred_in:,.2f} INR')
-    # Show salary statistics for the predicted salary
-    import numpy as np
-    if currency.startswith('USD'):
-        stats = {
-            'Min': payout_range[0],
-            'Max': payout_range[1],
-            'Mean': np.mean(payout_range),
-            'Median': np.median(payout_range)
-        }
-        st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>US Market Salary Stats:<br>Min: ${stats['Min']:,.2f} | Max: ${stats['Max']:,.2f} | Mean: ${stats['Mean']:,.2f} | Median: ${stats['Median']:,.2f}</span></div>", unsafe_allow_html=True)
-    else:
-        stats = {
-            'Min': payout_range[0],
-            'Max': payout_range[1],
-            'Mean': np.mean(payout_range),
-            'Median': np.median(payout_range)
-        }
-        st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>Indian Market Salary Stats:<br>Min: ₹{stats['Min']:,.2f} | Max: ₹{stats['Max']:,.2f} | Mean: ₹{stats['Mean']:,.2f} | Median: ₹{stats['Median']:,.2f}</span></div>", unsafe_allow_html=True)
+    gender_num = 1 if gender == 'Male' else 0
+    age_num = age
+
+    # Predict base salary for US and INR market
+    payout_us = us_market_payout.get(job, ai_market_payout(job, exp_num, edu_num, 'USD'))
+    payout_in = in_market_payout.get(job, ai_market_payout(job, exp_num, edu_num, 'INR'))
+    salary_pred_us = min(max(model.predict(input_df)[0], payout_us[0]), payout_us[1])
+    salary_pred_in = min(max(model.predict(input_df)[0], payout_in[0]), payout_in[1])
+
+    st.success(f'💰 Predicted Salary (US Market): ${salary_pred_us:,.2f} USD')
+    st.success(f'💰 Predicted Salary (Indian Market): ₹{salary_pred_in:,.2f} INR')
+
+    # Feature impact analysis
+    feature_impacts = []
+    # Education impact
+    for i, edu in enumerate(edu_list):
+        temp_df = input_df.copy()
+        temp_df['Education Level'] = i
+        pred_us = min(max(model.predict(temp_df)[0], payout_us[0]), payout_us[1])
+        pred_in = min(max(model.predict(temp_df)[0], payout_in[0]), payout_in[1])
+        feature_impacts.append((f'Education: {edu}', pred_us, pred_in))
+    # Experience impact
+    for exp in [0, 5, 10, 20, 30, 40]:
+        temp_df = input_df.copy()
+        temp_df['Years of Experience'] = exp
+        pred_us = min(max(model.predict(temp_df)[0], payout_us[0]), payout_us[1])
+        pred_in = min(max(model.predict(temp_df)[0], payout_in[0]), payout_in[1])
+        feature_impacts.append((f'Experience: {exp} yrs', pred_us, pred_in))
+    # Gender impact
+    for g in [0, 1]:
+        temp_df = input_df.copy()
+        temp_df['Gender'] = g
+        pred_us = min(max(model.predict(temp_df)[0], payout_us[0]), payout_us[1])
+        pred_in = min(max(model.predict(temp_df)[0], payout_in[0]), payout_in[1])
+        feature_impacts.append((f'Gender: {"Male" if g==1 else "Female"}', pred_us, pred_in))
+    # Age impact
+    for a in [18, 25, 35, 45, 55, 65]:
+        temp_df = input_df.copy()
+        temp_df['Age'] = a
+        pred_us = min(max(model.predict(temp_df)[0], payout_us[0]), payout_us[1])
+        pred_in = min(max(model.predict(temp_df)[0], payout_in[0]), payout_in[1])
+        feature_impacts.append((f'Age: {a}', pred_us, pred_in))
+    # Job Title impact
+    for i, job_t in enumerate(us_market_payout.keys()):
+        temp_df = input_df.copy()
+        temp_df['Job Title'] = i
+        pred_us = min(max(model.predict(temp_df)[0], us_market_payout[job_t][0]), us_market_payout[job_t][1])
+        pred_in = min(max(model.predict(temp_df)[0], in_market_payout[job_t][0]), in_market_payout[job_t][1])
+        feature_impacts.append((f'Job Title: {job_t}', pred_us, pred_in))
+
+    # Display feature impacts
+    st.markdown('---')
+    st.markdown('<h4>📊 Feature Impact on Salary (US & India Market)</h4>', unsafe_allow_html=True)
+    impact_table = pd.DataFrame(feature_impacts, columns=['Feature', 'US Market Salary', 'India Market Salary'])
+    st.dataframe(impact_table, use_container_width=True)
 
 # Batch prediction
 st.markdown('---')
@@ -252,30 +275,73 @@ if uploaded_file is not None:
     # Encode categorical columns to match model training
     edu_map = {v: i for i, v in enumerate(le_edu.classes_)}
     job_map = {v: i for i, v in enumerate(le_job.classes_)}
-    if 'Education Level' in batch_data.columns:
-        batch_data['Education Level'] = batch_data['Education Level'].map(edu_map).fillna(-1).astype(int)
-    if 'Job Title' in batch_data.columns:
-        batch_data['Job Title'] = batch_data['Job Title'].map(job_map).fillna(-1).astype(int)
-    # Select only model input features for prediction
+    # Fill missing columns with default values or AI logic
     feature_cols = ['Age', 'Gender', 'Education Level', 'Job Title', 'Years of Experience']
-    missing_cols = [col for col in feature_cols if col not in batch_data.columns]
-    if missing_cols:
-        st.error(f"The uploaded CSV is missing required columns: {', '.join(missing_cols)}. Please upload a file with all required columns.")
-    else:
-        batch_features = batch_data[feature_cols]
-        # Salary statistics for batch predictions
-        batch_data['PredictedSalaryUSD'] = model.predict(batch_features)
-        batch_stats = {
-            'Min': batch_data['PredictedSalaryUSD'].min(),
-            'Max': batch_data['PredictedSalaryUSD'].max(),
-            'Mean': batch_data['PredictedSalaryUSD'].mean(),
-            'Median': batch_data['PredictedSalaryUSD'].median()
-        }
-        st.write('✅ Predictions:')
-        st.dataframe(batch_data.head(), use_container_width=True)
-        st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>Batch Salary Stats:<br>Min: ${batch_stats['Min']:,.2f} | Max: ${batch_stats['Max']:,.2f} | Mean: ${batch_stats['Mean']:,.2f} | Median: ${batch_stats['Median']:,.2f}</span></div>", unsafe_allow_html=True)
-        csv = batch_data.to_csv(index=False).encode('utf-8')
-        st.download_button('⬇️ Download Predictions CSV', csv, file_name='predicted_salaries.csv', mime='text/csv')
+    for col in feature_cols:
+        if col not in batch_data.columns:
+            if col == 'Age':
+                batch_data['Age'] = 30  # Default age
+            elif col == 'Gender':
+                batch_data['Gender'] = 1  # Default male
+            elif col == 'Education Level':
+                batch_data['Education Level'] = 'Bachelors'
+            elif col == 'Job Title':
+                batch_data['Job Title'] = 'Tech-support'
+            elif col == 'Years of Experience':
+                batch_data['Years of Experience'] = 5
+    # Encode categorical columns
+    batch_data['Education Level'] = batch_data['Education Level'].map(edu_map).fillna(0).astype(int)
+    batch_data['Job Title'] = batch_data['Job Title'].map(job_map).fillna(0).astype(int)
+    # Ensure Gender is numeric (1 for Male, 0 for Female)
+    batch_data['Gender'] = batch_data['Gender'].apply(lambda x: 1 if str(x).lower() in ['male', '1'] else 0)
+    # Prepare features
+    batch_features = batch_data[feature_cols]
+    # Predict using model
+    batch_data['PredictedSalaryUSD'] = model.predict(batch_features)
+    # AI market standard logic for missing/invalid rows
+    def ai_market_payout(job, experience, education, market):
+        base_us = 35000 + (experience * 1000) + (education * 2000)
+        base_in = 350000 + (experience * 20000) + (education * 40000)
+        if market == 'USD':
+            return (base_us, base_us + 20000)
+        else:
+            return (base_in, base_in + 200000)
+    # Reverse maps for education/job
+    edu_list = ['Bachelors', 'Masters', 'PhD', 'HS-grad', 'Assoc', 'Some-college']
+    job_list = ['Tech-support', 'Craft-repair', 'Other-service', 'Sales',
+        'Exec-managerial', 'Prof-specialty', 'Handlers-cleaners', 'Machine-op-inspct',
+        'Adm-clerical', 'Farming-fishing', 'Transport-moving', 'Priv-house-serv',
+        'Protective-serv', 'Armed-Forces']
+    # Predict INR market salary using AI logic
+    def get_inr_salary(row):
+        job_idx = row['Job Title']
+        job_name = job_list[job_idx] if job_idx < len(job_list) else 'Tech-support'
+        edu_idx = row['Education Level'] if row['Education Level'] < len(edu_list) else 0
+        exp_val = row['Years of Experience']
+        if job_name in in_market_payout:
+            return in_market_payout[job_name][0]
+        else:
+            return ai_market_payout(job_name, exp_val, edu_idx, 'INR')[0]
+    batch_data['PredictedSalaryINR'] = batch_data.apply(get_inr_salary, axis=1)
+    # Show stats for both markets
+    batch_stats_us = {
+        'Min': batch_data['PredictedSalaryUSD'].min(),
+        'Max': batch_data['PredictedSalaryUSD'].max(),
+        'Mean': batch_data['PredictedSalaryUSD'].mean(),
+        'Median': batch_data['PredictedSalaryUSD'].median()
+    }
+    batch_stats_in = {
+        'Min': batch_data['PredictedSalaryINR'].min(),
+        'Max': batch_data['PredictedSalaryINR'].max(),
+        'Mean': batch_data['PredictedSalaryINR'].mean(),
+        'Median': batch_data['PredictedSalaryINR'].median()
+    }
+    st.write('✅ Predictions:')
+    st.dataframe(batch_data.head(), use_container_width=True)
+    st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>Batch Salary Stats (US):<br>Min: ${batch_stats_us['Min']:,.2f} | Max: ${batch_stats_us['Max']:,.2f} | Mean: ${batch_stats_us['Mean']:,.2f} | Median: ${batch_stats_us['Median']:,.2f}</span></div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>Batch Salary Stats (INR):<br>Min: ₹{batch_stats_in['Min']:,.2f} | Max: ₹{batch_stats_in['Max']:,.2f} | Mean: ₹{batch_stats_in['Mean']:,.2f} | Median: ₹{batch_stats_in['Median']:,.2f}</span></div>", unsafe_allow_html=True)
+    csv = batch_data.to_csv(index=False).encode('utf-8')
+    st.download_button('⬇️ Download Predictions CSV', csv, file_name='predicted_salaries.csv', mime='text/csv')
 
 # Animations and emojis
 st.markdown("""
