@@ -256,8 +256,11 @@ if uploaded_file is not None:
         batch_data['Education Level'] = batch_data['Education Level'].map(edu_map).fillna(-1).astype(int)
     if 'Job Title' in batch_data.columns:
         batch_data['Job Title'] = batch_data['Job Title'].map(job_map).fillna(-1).astype(int)
+    # Select only model input features for prediction
+    feature_cols = ['Age', 'Gender', 'Education Level', 'Job Title', 'Years of Experience']
+    batch_features = batch_data[feature_cols]
     # Salary statistics for batch predictions
-    batch_data['PredictedSalaryUSD'] = model.predict(batch_data)
+    batch_data['PredictedSalaryUSD'] = model.predict(batch_features)
     batch_stats = {
         'Min': batch_data['PredictedSalaryUSD'].min(),
         'Max': batch_data['PredictedSalaryUSD'].max(),
@@ -269,7 +272,7 @@ if uploaded_file is not None:
     st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>Batch Salary Stats:<br>Min: ${batch_stats['Min']:,.2f} | Max: ${batch_stats['Max']:,.2f} | Mean: ${batch_stats['Mean']:,.2f} | Median: ${batch_stats['Median']:,.2f}</span></div>", unsafe_allow_html=True)
     csv = batch_data.to_csv(index=False).encode('utf-8')
     st.download_button('⬇️ Download Predictions CSV', csv, file_name='predicted_salaries.csv', mime='text/csv')
-           # No additional code needed here
+
 # Animations and emojis
 st.markdown("""
     <div style='text-align:center;'>
