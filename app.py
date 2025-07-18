@@ -262,20 +262,20 @@ if uploaded_file is not None:
     if missing_cols:
         st.error(f"The uploaded CSV is missing required columns: {', '.join(missing_cols)}. Please upload a file with all required columns.")
     else:
-    batch_features = batch_data[feature_cols]
-    # Salary statistics for batch predictions
-    batch_data['PredictedSalaryUSD'] = model.predict(batch_features)
-    batch_stats = {
-        'Min': batch_data['PredictedSalaryUSD'].min(),
-        'Max': batch_data['PredictedSalaryUSD'].max(),
-        'Mean': batch_data['PredictedSalaryUSD'].mean(),
-        'Median': batch_data['PredictedSalaryUSD'].median()
-    }
-    st.write('✅ Predictions:')
-    st.dataframe(batch_data.head(), use_container_width=True)
-    st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>Batch Salary Stats:<br>Min: ${batch_stats['Min']:,.2f} | Max: ${batch_stats['Max']:,.2f} | Mean: ${batch_stats['Mean']:,.2f} | Median: ${batch_stats['Median']:,.2f}</span></div>", unsafe_allow_html=True)
-    csv = batch_data.to_csv(index=False).encode('utf-8')
-    st.download_button('⬇️ Download Predictions CSV', csv, file_name='predicted_salaries.csv', mime='text/csv')
+        batch_features = batch_data[feature_cols]
+        # Salary statistics for batch predictions
+        batch_data['PredictedSalaryUSD'] = model.predict(batch_features)
+        batch_stats = {
+            'Min': batch_data['PredictedSalaryUSD'].min(),
+            'Max': batch_data['PredictedSalaryUSD'].max(),
+            'Mean': batch_data['PredictedSalaryUSD'].mean(),
+            'Median': batch_data['PredictedSalaryUSD'].median()
+        }
+        st.write('✅ Predictions:')
+        st.dataframe(batch_data.head(), use_container_width=True)
+        st.markdown(f"<div style='text-align:center;'><span style='font-size:16px; color:#43e97b;'>Batch Salary Stats:<br>Min: ${batch_stats['Min']:,.2f} | Max: ${batch_stats['Max']:,.2f} | Mean: ${batch_stats['Mean']:,.2f} | Median: ${batch_stats['Median']:,.2f}</span></div>", unsafe_allow_html=True)
+        csv = batch_data.to_csv(index=False).encode('utf-8')
+        st.download_button('⬇️ Download Predictions CSV', csv, file_name='predicted_salaries.csv', mime='text/csv')
 
 # Animations and emojis
 st.markdown("""
