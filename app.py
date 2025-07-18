@@ -234,6 +234,9 @@ if st.button('🚀 Predict Salary'):
         usd_to_inr = usd_json.get('rates', {}).get('INR', None)
         inr_to_usd = 1 / usd_to_inr if usd_to_inr else None
         rate_msg = ""
+        # Convert between currencies
+        salary_us_to_inr = salary_pred_us * usd_to_inr
+        salary_in_to_us = salary_pred_in / usd_to_inr
         if usd_to_inr:
             rate_msg += f"Real-time USD to INR Rate: <b>₹{usd_to_inr:,.2f}</b><br>"
         else:
@@ -277,6 +280,9 @@ if uploaded_file is not None:
         usd_to_inr = usd_json.get('rates', {}).get('INR', None)
         inr_to_usd = 1 / usd_to_inr if usd_to_inr else None
         rate_msg = ""
+        # Convert between currencies
+        salary_us_to_inr = salary_pred_us * usd_to_inr
+        salary_in_to_us = salary_pred_in / usd_to_inr
         if usd_to_inr:
             rate_msg += f"Real-time USD to INR Rate: <b>₹{usd_to_inr:,.2f}</b><br>"
         else:
