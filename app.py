@@ -258,6 +258,10 @@ if uploaded_file is not None:
         batch_data['Job Title'] = batch_data['Job Title'].map(job_map).fillna(-1).astype(int)
     # Select only model input features for prediction
     feature_cols = ['Age', 'Gender', 'Education Level', 'Job Title', 'Years of Experience']
+    missing_cols = [col for col in feature_cols if col not in batch_data.columns]
+    if missing_cols:
+        st.error(f"The uploaded CSV is missing required columns: {', '.join(missing_cols)}. Please upload a file with all required columns.")
+    else:
     batch_features = batch_data[feature_cols]
     # Salary statistics for batch predictions
     batch_data['PredictedSalaryUSD'] = model.predict(batch_features)
