@@ -219,7 +219,7 @@ if st.button('🚀 Predict Salary'):
     except Exception:
         usd_to_inr = 83.0  # fallback value
     # US market prediction
-    payout_range_us = us_market_payout.get(job, ai_job_payout(job, 'USD'))
+    payout_range = us_market_payout.get(job, ai_job_payout(job, exp_num, edu_num, 'USD'))
     salary_pred_us = min(max(salary_pred, payout_range_us[0]), payout_range_us[1])
     # Indian market prediction
     payout_range_in = in_market_payout.get(job, ai_job_payout(job, 'INR'))
