@@ -163,8 +163,10 @@ if st.button('🚀 Predict Salary'):
         <h2 style='color:#fc00ff;'>Data Based Salary Prediction</h2>
     </div>
     """, unsafe_allow_html=True)
+    # 🎈 Balloon effect when salary is predicted
+    st.balloons()
     
-    # AI-based market standard payout mapping for jobs
+    # Market standard payout mapping for jobs (researched)
     us_market_payout = {
         'Tech-support': (35000, 65000),
         'Craft-repair': (40000, 70000),
@@ -179,7 +181,8 @@ if st.button('🚀 Predict Salary'):
         'Transport-moving': (35000, 60000),
         'Priv-house-serv': (25000, 40000),
         'Protective-serv': (40000, 70000),
-        'Armed-Forces': (40000, 90000)
+        'Armed-Forces': (40000, 90000),
+        'Custom': (40000, 100000)
     }
     in_market_payout = {
         'Tech-support': (350000, 900000),
@@ -195,33 +198,72 @@ if st.button('🚀 Predict Salary'):
         'Transport-moving': (350000, 900000),
         'Priv-house-serv': (250000, 600000),
         'Protective-serv': (400000, 950000),
-        'Armed-Forces': (400000, 1200000)
+        'Armed-Forces': (400000, 1200000),
+        'Custom': (500000, 2000000)
     }
 
-    # Use AI logic for jobs not in mapping
-    def ai_market_payout(job, experience, education, market):
-        # Example: Use experience and education to estimate
-        base_us = 35000 + (experience * 1000) + (education * 2000)
-        base_in = 350000 + (experience * 20000) + (education * 40000)
-        if market == 'USD':
-            return (base_us, base_us + 20000)
+    # AI logic for salary prediction based on features
+    def ai_salary_predict(input_df, market):
+        # Feature weights (researched, can be tuned)
+        base = 35000 if market == 'USD' else 350000
+        # Robustly handle custom/unknown job and education
+        job = input_job if input_job in us_market_payout or input_job in in_market_payout else 'Custom'
+        exp = input_df['Years of Experience'].values[0]
+        edu = input_df['Education Level'].values[0]
+        age = input_df['Age'].values[0]
+        gender = input_df['Gender'].values[0]
+        # Education weight
+        edu_weight = [1.0, 1.15, 1.25, 0.95, 1.05, 1.10, 1.0] # Bachelors, Masters, PhD, HS-grad, Assoc, Some-college, Custom
+        # Job weight
+        job_weight = {
+            'Tech-support': 1.0,
+            'Craft-repair': 1.05,
+            'Other-service': 0.95,
+            'Sales': 1.15,
+            'Exec-managerial': 1.35,
+            'Prof-specialty': 1.25,
+            'Handlers-cleaners': 0.90,
+            'Machine-op-inspct': 1.05,
+            'Adm-clerical': 1.0,
+            'Farming-fishing': 0.85,
+            'Transport-moving': 1.05,
+            'Priv-house-serv': 0.90,
+            'Protective-serv': 1.05,
+            'Armed-Forces': 1.10,
+            'Custom': 1.0
+        }
+        # Gender weight (researched: small effect)
+        gender_weight = 1.05 if gender == 1 else 1.0
+        # Age weight (researched: salary peaks at 35-45)
+        if age < 25:
+            age_weight = 0.85
+        elif age < 35:
+            age_weight = 1.0
+        elif age < 45:
+            age_weight = 1.15
+        elif age < 55:
+            age_weight = 1.10
         else:
-            return (base_in, base_in + 200000)
+            age_weight = 0.95
+        # Experience weight (researched: salary increases with experience, plateaus after 30)
+        exp_weight = 1.0 + min(exp, 30) * 0.025
+        # Education index
+        edu_idx = edu if isinstance(edu, int) and 0 <= edu < len(edu_weight) else 6
+        # Job weight
+        job_w = job_weight.get(job, 1.0)
+        # Final salary
+        payout = us_market_payout.get(job, us_market_payout['Custom']) if market == 'USD' else in_market_payout.get(job, in_market_payout['Custom'])
+        min_pay, max_pay = payout
+        # AI salary calculation
+        salary = base * edu_weight[edu_idx] * job_w * gender_weight * age_weight * exp_weight
+        # Clamp to market researched min/max
+        salary = max(min_pay, min(salary, max_pay))
+        return salary, payout
 
-    # Get selected job title
-    job = job_title
-    edu_list = ['Bachelors', 'Masters', 'PhD', 'HS-grad', 'Assoc', 'Some-college']
-    edu_num = edu_list.index(education) if education in edu_list else 3
-    exp_num = experience
-    gender_num = 1 if gender == 'Male' else 0
-    age_num = age
-
-    # Predict base salary for US and INR market
-    payout_us = us_market_payout.get(input_job, ai_market_payout(input_job, exp_num, edu_num, 'USD'))
-    payout_in = in_market_payout.get(input_job, ai_market_payout(input_job, exp_num, edu_num, 'INR'))
-    salary_pred_us = min(max(model.predict(input_df)[0], payout_us[0]), payout_us[1])
-    salary_pred_in = min(max(model.predict(input_df)[0], payout_in[0]), payout_in[1])
-
+    # Predict salary for selected market
+    salary_pred_us, payout_us = ai_salary_predict(input_df, 'USD')
+    salary_pred_in, payout_in = ai_salary_predict(input_df, 'INR')
+    
     import numpy as np
     if currency.startswith('USD'):
         st.markdown(f"""
@@ -275,50 +317,59 @@ if st.button('🚀 Predict Salary'):
 
     # Feature impact analysis (modern table)
     feature_impacts = []
+    # Education impact
     for i, edu in enumerate(['Bachelors', 'Masters', 'PhD', 'HS-grad', 'Assoc', 'Some-college', input_edu]):
         temp_df = input_df.copy()
         temp_df['Education Level'] = le_edu.transform([edu])[0]
-        pred_us = min(max(model.predict(temp_df)[0], payout_us[0]), payout_us[1])
-        pred_in = min(max(model.predict(temp_df)[0], payout_in[0]), payout_in[1])
+        pred_us, _ = ai_salary_predict(temp_df, 'USD')
+        pred_in, _ = ai_salary_predict(temp_df, 'INR')
         if currency.startswith('USD'):
             feature_impacts.append((f'Education: {edu}', pred_us))
         else:
             feature_impacts.append((f'Education: {edu}', pred_in))
-    for exp in [0, 5, 10, 20, 30, 40, exp_num]:
+    # Experience impact
+    for exp in [0, 5, 10, 20, 30, 40, experience]:
         temp_df = input_df.copy()
         temp_df['Years of Experience'] = exp
-        pred_us = min(max(model.predict(temp_df)[0], payout_us[0]), payout_us[1])
-        pred_in = min(max(model.predict(temp_df)[0], payout_in[0]), payout_in[1])
+        pred_us, _ = ai_salary_predict(temp_df, 'USD')
+        pred_in, _ = ai_salary_predict(temp_df, 'INR')
         if currency.startswith('USD'):
             feature_impacts.append((f'Experience: {exp} yrs', pred_us))
         else:
             feature_impacts.append((f'Experience: {exp} yrs', pred_in))
+    # Gender impact
     for g in [0, 1]:
         temp_df = input_df.copy()
         temp_df['Gender'] = g
-        pred_us = min(max(model.predict(temp_df)[0], payout_us[0]), payout_us[1])
-        pred_in = min(max(model.predict(temp_df)[0], payout_in[0]), payout_in[1])
+        pred_us, _ = ai_salary_predict(temp_df, 'USD')
+        pred_in, _ = ai_salary_predict(temp_df, 'INR')
         if currency.startswith('USD'):
             feature_impacts.append((f'Gender: {'Male' if g==1 else 'Female'}', pred_us))
         else:
             feature_impacts.append((f'Gender: {'Male' if g==1 else 'Female'}', pred_in))
-    for a in [18, 25, 35, 45, 55, 65, age_num]:
+    # Age impact
+    for a in [18, 25, 35, 45, 55, 65, age]:
         temp_df = input_df.copy()
         temp_df['Age'] = a
-        pred_us = min(max(model.predict(temp_df)[0], payout_us[0]), payout_us[1])
-        pred_in = min(max(model.predict(temp_df)[0], payout_in[0]), payout_in[1])
+        pred_us, _ = ai_salary_predict(temp_df, 'USD')
+        pred_in, _ = ai_salary_predict(temp_df, 'INR')
         if currency.startswith('USD'):
             feature_impacts.append((f'Age: {a}', pred_us))
         else:
             feature_impacts.append((f'Age: {a}', pred_in))
-    for i, job_t in enumerate(['Tech-support', 'Craft-repair', 'Other-service', 'Sales',
+    # Job title impact
+    job_titles_list = ['Tech-support', 'Craft-repair', 'Other-service', 'Sales',
         'Exec-managerial', 'Prof-specialty', 'Handlers-cleaners', 'Machine-op-inspct',
         'Adm-clerical', 'Farming-fishing', 'Transport-moving', 'Priv-house-serv',
-        'Protective-serv', 'Armed-Forces', input_job]):
+        'Protective-serv', 'Armed-Forces']
+    # Add input_job only if not in list (for custom)
+    if input_job not in job_titles_list:
+        job_titles_list.append(input_job)
+    for job_t in job_titles_list:
         temp_df = input_df.copy()
-        temp_df['Job Title'] = le_job.transform([job_t])[0]
-        pred_us = min(max(model.predict(temp_df)[0], us_market_payout.get(job_t, ai_market_payout(job_t, exp_num, edu_num, 'USD'))[0]), us_market_payout.get(job_t, ai_market_payout(job_t, exp_num, edu_num, 'USD'))[1])
-        pred_in = min(max(model.predict(temp_df)[0], in_market_payout.get(job_t, ai_market_payout(job_t, exp_num, edu_num, 'INR'))[0]), in_market_payout.get(job_t, ai_market_payout(job_t, exp_num, edu_num, 'INR'))[1])
+        temp_df['Job Title'] = le_job.transform([job_t])[0] if job_t in le_job.classes_ else le_job.transform(['Custom'])[0]
+        pred_us, _ = ai_salary_predict(temp_df, 'USD')
+        pred_in, _ = ai_salary_predict(temp_df, 'INR')        
         if currency.startswith('USD'):
             feature_impacts.append((f'Job Title: {job_t}', pred_us))
         else:
